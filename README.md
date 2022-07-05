@@ -12,9 +12,19 @@ To get started with building Pixel Experience GSI, you'll need to get familiar w
     ```
 - Finally, start the build script:
     ```
-    bash treble_build_pe/build.sh [twelve|twelve-plus]
+    bash treble_build_pe/build.sh twelve
     ```
 
+- If you do get any error about the repo possibly not being able to initialize (or similar), you can try manually doing what the script should have (but in my case, it didn't, so here I am mentioning these steps):
+	```
+	repo init -u https://github.com/PixelExperience/manifest -b twelve
+	```
+	```
+	mkdir -p .repo/local_manifests
+	```
+	```
+    cp treble_build_pe/manifest.xml .repo/local_manifests/pixel.xml
+	```
 ## Credits
 These people have helped this project in some way or another, so they should be the ones who receive all the credit:
 - [Pixel Experience Team](https://download.pixelexperience.org/about)
