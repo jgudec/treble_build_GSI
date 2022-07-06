@@ -1,0 +1,35 @@
+From 5f9b70b1e0ce23669b37ccd3fb05fe594b24b623 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Wed, 6 Jul 2022 22:43:27 +0100
+Subject: [PATCH 5/6] Make voldmanaged storage adoptable and log texfat FS driver
+ anmes
+
+Change-Id: I814e353edf36a8b5e1bd5ec13039979802fbe762
+---
+ main.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/main.cpp b/main.cpp
+index dc63cae..699021d 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -68,6 +68,7 @@ int main(int argc, char** argv) {
+ 
+     LOG(DEBUG) << "Detected support for:"
+                << (android::vold::IsFilesystemSupported("exfat") ? " exfat" : "")
++			   << (android::vold::IsFilesystemSupported("texfat") ? " texfat" : "")
+                << (android::vold::IsFilesystemSupported("ext4") ? " ext4" : "")
+                << (android::vold::IsFilesystemSupported("f2fs") ? " f2fs" : "")
+                << (android::vold::IsFilesystemSupported("ntfs") ? " ntfs" : "")
+@@ -263,7 +264,7 @@ static int process_config(VolumeManager* vm, VoldConfigs* configs) {
+             int partnum = entry.partnum;
+             int flags = 0;
+ 
+-            if (entry.is_encryptable()) {
++            if (entry.is_encryptable() || true) {
+                 flags |= android::vold::Disk::Flags::kAdoptable;
+                 configs->has_adoptable = true;
+             }
+-- 
+2.17.1
+
