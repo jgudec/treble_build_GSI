@@ -9,4 +9,5 @@
   <project name="phhusson/treble_app" path="treble_app" remote="github" revision="master" />
   <project name="ponces/sas-creator" path="sas-creator" remote="github" revision="master" />
   <project name="notmyst33d/libaptX" path="external/aptx" remote="github" revision="main" />
+  <project name="PlusLineage/vendor_lawnchair" path="vendor/lawnchair" remote="github" revision="plus" />
 </manifest>

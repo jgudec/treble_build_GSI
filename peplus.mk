@@ -14,7 +14,8 @@ PRODUCT_PACKAGES += \
     WallpaperPicker \
     ImageWallpaper \
     LivePicker \
-    ThemePicker
+    ThemePicker \
+	GCamGO
 
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.system.ota.json_url=https://raw.githubusercontent.com/ponces/treble_build_pe/twelve/otaplus.json

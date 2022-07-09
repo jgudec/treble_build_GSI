@@ -43,6 +43,7 @@ applyPatches() {
     echo "--> Applying PHH patches"
     cd device/phh/treble
     cp $PEMK .
+	cp $PWD/treble_build_pe/gcam_go .
     bash generate.sh $(echo $PEMK | sed "s#$BL/##;s#.mk##")
     cd ../../..
     bash $BL/apply-patches.sh $BL phh $BRANCH

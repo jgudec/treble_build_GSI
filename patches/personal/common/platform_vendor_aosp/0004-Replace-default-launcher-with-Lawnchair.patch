@@ -1,0 +1,28 @@
+From db267fd7b61ad8797db7564ace27f3f21174e72c Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sat, 9 Jul 2022 10:34:30 +0100
+Subject: [PATCH] Replace default launcher with Lawnchair
+
+...and add Lawnicons
+
+Change-Id: Idfa14d32a131350c25af73fac9fb79df5cf3ed73
+---
+ config/common.mk | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/config/common.mk b/config/common.mk
+index 57541f3e..779086e2 100644
+--- a/config/common.mk
++++ b/config/common.mk
+@@ -227,4 +227,8 @@ $(call inherit-product, vendor/aosp/config/rro_overlays.mk)
+ # Themed icons
+ $(call inherit-product, packages/overlays/ThemeIcons/config.mk)
+ 
++# Lawnchair and Lawnicons
++$(call inherit-product-if-exists, vendor/lawnchair/lawnchair.mk)
++
++
+ -include $(WORKSPACE)/build_env/image-auto-bits.mk
+-- 
+2.17.1
+
