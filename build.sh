@@ -39,11 +39,16 @@ applyPatches() {
     echo "--> Applying prerequisite patches"
     bash $BL/apply-patches.sh $BL prerequisite $BRANCH
     echo
+	
+	echo "--> Downloading GCam Go"
+	cd $BL/gcam_go
+	[ ! -f gcam_go.apk ] && curl -LO https://dl.dropboxusercontent.com/s/eq748jqyd33ytj2/gcam_go.apk
+	cd ../..
+	
 
     echo "--> Applying PHH patches"
     cd device/phh/treble
     cp $PEMK .
-	cp $PWD/treble_build_pe/gcam_go .
     bash generate.sh $(echo $PEMK | sed "s#$BL/##;s#.mk##")
     cd ../../..
     bash $BL/apply-patches.sh $BL phh $BRANCH
