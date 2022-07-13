@@ -7,6 +7,10 @@ echo "                  by                  "
 echo "                ponces                "
 echo "--------------------------------------"
 echo
+export USE_CCACHE=1
+export CCACHE_DIR=/usr/lib/ccache
+export CCACHE_COMPRESS=1
+export CCACHE_MAXSIZE=100G
 
 set -e
 
