@@ -1,7 +1,7 @@
-From 139b7b8fbe79cd2f0451772fe96719ccb8604195 Mon Sep 17 00:00:00 2001
+From b7a589f951f54325d4eea3fab95cdcb92006784e Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Tue, 5 Jul 2022 23:18:40 +0100
-Subject: [PATCH] Implement a dirty fix for Galaxy S22 audio policy
+Subject: [PATCH 09/11] Implement a dirty fix for Galaxy S22 audio policy
 
 ---
  base.mk                                       |   4 +
@@ -11,10 +11,10 @@ Subject: [PATCH] Implement a dirty fix for Galaxy S22 audio policy
  create mode 100644 files/samsung_s22_audio_policy_configuration.xml
 
 diff --git a/base.mk b/base.mk
-index a14ae45..867af81 100644
+index f3fb6c9..2733322 100644
 --- a/base.mk
 +++ b/base.mk
-@@ -237,3 +237,7 @@ include build/make/target/product/gsi_release.mk
+@@ -234,3 +234,7 @@ include build/make/target/product/gsi_release.mk
  # Protect deskclock from power save
  PRODUCT_COPY_FILES += \
  	device/phh/treble/files/com.android.deskclock_whitelist.xml:system/etc/sysconfig/com.android.deskclock_whitelist.xml
@@ -25,7 +25,7 @@ index a14ae45..867af81 100644
 \ No newline at end of file
 diff --git a/files/samsung_s22_audio_policy_configuration.xml b/files/samsung_s22_audio_policy_configuration.xml
 new file mode 100644
-index 0000000..415804f
+index 0000000..d1e6788
 --- /dev/null
 +++ b/files/samsung_s22_audio_policy_configuration.xml
 @@ -0,0 +1,132 @@

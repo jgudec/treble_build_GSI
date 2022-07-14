@@ -1,7 +1,7 @@
-From 4507f89468db75664dbd7fbdcf8d73b3060b2a07 Mon Sep 17 00:00:00 2001
+From 04dba44d47295cf10e7d953b27da9cfbfeb88b03 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Thu, 22 Jul 2021 11:35:11 +0100
-Subject: [PATCH 8/8] sepolicy: Add flipendo sepolicy
+Subject: [PATCH 08/11] sepolicy: Add flipendo sepolicy
 
 Fix Extreme Battery Saver SELinux denials
 ---
@@ -53,5 +53,5 @@ index 0000000..ebf7fe4
 @@ -0,0 +1 @@
 +user=_app seinfo=platform name=com.google.android.flipendo domain=flipendo type=app_data_file levelFrom=all
 -- 
-2.25.1
+2.17.1
 

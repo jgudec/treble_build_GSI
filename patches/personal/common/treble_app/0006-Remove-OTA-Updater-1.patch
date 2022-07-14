@@ -1,0 +1,27 @@
+From 3c26cb10e9659f5c96c1b851501bce697a5993e3 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Thu, 14 Jul 2022 17:34:26 +0100
+Subject: [PATCH] Remove OTA Updater #1
+
+---
+ app/src/main/res/xml/pref_headers.xml | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/app/src/main/res/xml/pref_headers.xml b/app/src/main/res/xml/pref_headers.xml
+index 9c0c7f9..40adfe2 100644
+--- a/app/src/main/res/xml/pref_headers.xml
++++ b/app/src/main/res/xml/pref_headers.xml
+@@ -38,10 +38,4 @@
+     <header
+         android:fragment="me.phh.treble.app.ImsSettingsFragment"
+         android:title="IMS features" />
+-    <header
+-        android:id="@+id/updater"
+-        android:title="Updater">
+-        <intent android:action="android.settings.SYSTEM_UPDATE_SETTINGS"
+-                android:targetClass=".UpdaterActivity"/>
+-    </header>
+ </preference-headers>
+-- 
+2.17.1
+

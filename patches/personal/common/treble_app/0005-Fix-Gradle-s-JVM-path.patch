@@ -1,0 +1,21 @@
+From f68144a5b1e18c4fbdace950622410b327f0f5e8 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Thu, 14 Jul 2022 17:26:13 +0100
+Subject: [PATCH] Fix Gradle's JVM path
+
+---
+ gradle.properties | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gradle.properties b/gradle.properties
+index 5bac8ac..28f773e 100644
+--- a/gradle.properties
++++ b/gradle.properties
+@@ -1 +1,3 @@
+ android.useAndroidX=true
++
++org.gradle.java.home=/usr/lib/jvm/java-11-openjdk-amd64
+\ No newline at end of file
+-- 
+2.17.1
+

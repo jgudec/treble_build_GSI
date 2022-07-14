@@ -1,0 +1,26 @@
+From 919ed0489e79587408a0963088e61355c7d9f972 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Thu, 14 Jul 2022 18:38:35 +0100
+Subject: [PATCH] Remove OTA Updater #2
+
+---
+ app/src/main/java/me/phh/treble/app/SettingsActivity.kt | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/app/src/main/java/me/phh/treble/app/SettingsActivity.kt b/app/src/main/java/me/phh/treble/app/SettingsActivity.kt
+index 52013ae..8591cc7 100644
+--- a/app/src/main/java/me/phh/treble/app/SettingsActivity.kt
++++ b/app/src/main/java/me/phh/treble/app/SettingsActivity.kt
+@@ -70,9 +70,6 @@ class SettingsActivity : PreferenceActivity() {
+             target.removeIf { it.fragment == ImsSettingsFragment::class.java.name }
+         if (!CustomSettings.enabled())
+             target.removeIf { it.fragment == CustomSettingsFragment::class.java.name }
+-        val p = SystemProperties.get("ro.system.ota.json_url", "")
+-        if (p.trim() == "")
+-            target.removeIf { it.id.compareTo(R.id.updater) == 0 }
+     }
+ 
+     /**
+-- 
+2.17.1
+

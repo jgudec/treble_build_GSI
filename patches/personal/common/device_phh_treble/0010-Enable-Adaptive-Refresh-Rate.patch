@@ -1,18 +1,18 @@
-From 8ae57dcdacec00b0657c9972b06dfb24538ded5c Mon Sep 17 00:00:00 2001
+From b4c717c1b16c914132b70f9799e1e17ef1df6dc9 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Wed, 13 Jul 2022 18:14:00 +0100
-Subject: [PATCH] Enable Adaptive Refresh Rate
+Subject: [PATCH 10/11] Enable Adaptive Refresh Rate
 
 This is specific to the Galaxy S22 series and requires the following commit: https://github.com/jgudec/vendor_hardware_overlay/commit/2917d01acd99957711a0d12f2a33cffbbfa88057
 ---
- system.prop | 3 +++
- 1 file changed, 3 insertions(+)
+ system.prop | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/system.prop b/system.prop
-index a6c7ede..02b1781 100644
+index a6c7ede..15ac66b 100644
 --- a/system.prop
 +++ b/system.prop
-@@ -14,3 +14,6 @@ ro.boot.realme.lockstate=0
+@@ -14,3 +14,11 @@ ro.boot.realme.lockstate=0
  
  #Fixes fingerprint unlock delay
  persist.wm.enable_remote_keyguard_animation=0
@@ -21,9 +21,10 @@ index a6c7ede..02b1781 100644
 +persist.sys.sf.hs_mode=3
 +debug.sf.frame_rate_multiple_threshold=120 
 +ro.surface_flinger.set_display_power_timer_ms=1000 
-+ro.surface_flinger.set_idle_timer_ms=4000 
-+ro.surface_flinger.set_touch_timer_ms=4000 
++ro.surface_flinger.set_idle_timer_ms=1500 
++ro.surface_flinger.set_touch_timer_ms=1500 
 +ro.surface_flinger.use_content_detection_for_refresh_rate=true
+\ No newline at end of file
 -- 
 2.17.1
 

@@ -1,7 +1,7 @@
-From c6324aa2772d4834ae42fda6603bf59116c2119c Mon Sep 17 00:00:00 2001
+From 2f54ed4461cb8d361a9843cfc070b222d2269315 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Thu, 14 Jul 2022 08:23:51 +0100
-Subject: [PATCH] Fix a CTS issue
+Subject: [PATCH 11/11] Fix a CTS issue
 
 ---
  base.mk | 2 +-
