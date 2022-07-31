@@ -1,5 +1,7 @@
 # Pixel Experience GSI
 
+##At this point, these builds are going to work well on the S22 lineup, maybe the S21 as well. The rest of devices might end up with broken things unless one removes certain patches within the "personal" patch folder, specifically the device tree ones. Make builds with this script at your own peril.
+
 ## Build
 To get started with building Pixel Experience GSI, you'll need to get familiar with [Git and Repo](https://source.android.com/source/using-repo.html) as well as [How to build a GSI](https://github.com/phhusson/treble_experimentations/wiki/How-to-build-a-GSI%3F).
 - Create a new working directory for your Pixel Experience build and navigate to it:

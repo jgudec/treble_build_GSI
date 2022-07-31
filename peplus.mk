@@ -10,7 +10,5 @@ TARGET_SUPPORTS_CALL_RECORDING := true
 PRODUCT_PACKAGES += \
     libaptX_encoder \
     libaptXHD_encoder \
-    ImageWallpaper \
-    LivePicker \
-    ThemePicker \
-	GoogleCameraGo
+	GoogleCameraGo 
+	

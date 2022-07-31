@@ -1,7 +1,7 @@
-From 3c26cb10e9659f5c96c1b851501bce697a5993e3 Mon Sep 17 00:00:00 2001
+From 1a59689294dd320d0f33c0af071b45b5cb59f6be Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Thu, 14 Jul 2022 17:34:26 +0100
-Subject: [PATCH] Remove OTA Updater #1
+Subject: [PATCH 6/9] Remove OTA Updater #1
 
 ---
  app/src/main/res/xml/pref_headers.xml | 6 ------

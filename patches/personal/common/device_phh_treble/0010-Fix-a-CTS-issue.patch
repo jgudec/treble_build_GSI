@@ -1,14 +1,14 @@
-From 2f54ed4461cb8d361a9843cfc070b222d2269315 Mon Sep 17 00:00:00 2001
+From 51885f0344071aa283654507a609dc01fd01a3a3 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Thu, 14 Jul 2022 08:23:51 +0100
-Subject: [PATCH 11/11] Fix a CTS issue
+Subject: [PATCH 10/10] Fix a CTS issue
 
 ---
  base.mk | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/base.mk b/base.mk
-index 2733322..f951d1e 100644
+index a777811..e1f2c01 100644
 --- a/base.mk
 +++ b/base.mk
 @@ -61,7 +61,7 @@ PRODUCT_COPY_FILES += \

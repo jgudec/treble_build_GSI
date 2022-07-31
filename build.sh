@@ -8,6 +8,9 @@ echo "                ponces                "
 echo "--------------------------------------"
 echo
 export USE_CCACHE=1
+export CCACHE_COMPRESS=1
+export CCACHE_EXEC=/usr/bin/ccache
+export CCACHE_DIR=/mnt/ccache
 export CCACHE_EXEC=$(command -v ccache)
 
 set -e
@@ -80,17 +83,17 @@ buildTrebleApp() {
 }
 
 buildVariant() {
-    echo "--> Building treble_arm64_bgN"
-    lunch treble_arm64_bgN-userdebug
+    echo "--> Building treble_arm64_bvN"
+    lunch treble_arm64_bvN-userdebug
     make installclean
     make -j$(nproc --all) systemimage
-    mv $OUT/system.img $BD/system-treble_arm64_bgN.img
+    mv $OUT/system.img $BD/system-treble_arm64_bvN.img
     echo
 }
 
 generatePackages() {
     echo "--> Generating packages"
-	xz -cv $BD/system-treble_arm64_bgN.img -T0 > $BD/"$BUILD"_arm64-ab-12.1-$BUILD_DATE-UNOFFICIAL.img.xz
+	xz -cv $BD/system-treble_arm64_bvN.img -T0 > $BD/"$BUILD"_arm64-ab-12.1-$BUILD_DATE-UNOFFICIAL.img.xz
     rm -rf $BD/system-*.img
     echo
 }

@@ -1,0 +1,109 @@
+From 03d5629b20e365c8c7b2a9e8c56f98487a6590bf Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sat, 30 Jul 2022 10:27:35 +0100
+Subject: [PATCH 8/9] Add min and max refresh rate options
+
+---
+ app/src/main/java/me/phh/treble/app/Misc.kt   | 12 +++++++++++
+ .../java/me/phh/treble/app/MiscSettings.kt    |  2 ++
+ app/src/main/res/values/arrays.xml            | 21 +++++++++++++++++++
+ app/src/main/res/xml/pref_misc.xml            | 12 +++++++++++
+ 4 files changed, 47 insertions(+)
+ create mode 100644 app/src/main/res/values/arrays.xml
+
+diff --git a/app/src/main/java/me/phh/treble/app/Misc.kt b/app/src/main/java/me/phh/treble/app/Misc.kt
+index bcbbc6e..e2136e1 100644
+--- a/app/src/main/java/me/phh/treble/app/Misc.kt
++++ b/app/src/main/java/me/phh/treble/app/Misc.kt
+@@ -178,6 +178,16 @@ object Misc: EntryStartup {
+                     forceFps(value)
+                 }
+             }
++            MiscSettings.minHz -> {
++                val value = sp.getString(key, "-1").toInt()
++                    Settings.System.putInt(c.contentResolver,
++                        "MIN_REFRESH_RATE".toLowerCase(), value);
++            }
++            MiscSettings.maxHz -> {
++                val value = sp.getString(key, "-1").toInt()
++                    Settings.System.putInt(c.contentResolver,
++                        "PEAK_REFRESH_RATE".toLowerCase(), value);
++            }
+             MiscSettings.remotectl -> {
+                 val value = sp.getBoolean(key, false)
+                 SystemProperties.set("persist.sys.phh.remote", if (value) "true" else "false")
+@@ -258,5 +268,7 @@ object Misc: EntryStartup {
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.noHwcomposer)
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.storageFUSE)
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.dt2w)
++        spListener.onSharedPreferenceChanged(sp, MiscSettings.minHz)
++        spListener.onSharedPreferenceChanged(sp, MiscSettings.maxHz)
+     }
+ }
+diff --git a/app/src/main/java/me/phh/treble/app/MiscSettings.kt b/app/src/main/java/me/phh/treble/app/MiscSettings.kt
+index ab5bc3b..11beafe 100644
+--- a/app/src/main/java/me/phh/treble/app/MiscSettings.kt
++++ b/app/src/main/java/me/phh/treble/app/MiscSettings.kt
+@@ -12,6 +12,8 @@ object MiscSettings : Settings {
+     val mobileSignal = "key_misc_mobile_signal"
+     val fpsDivisor = "key_misc_fps_divisor"
+     val displayFps = "key_misc_display_fps"
++    val minHz = "key_misc_min_hz"
++    val maxHz = "key_misc_max_hz"
+     val maxAspectRatioPreO = "key_misc_max_aspect_ratio_pre_o"
+     val multiCameras = "key_misc_multi_camera"
+     val forceCamera2APIHAL3 = "key_misc_force_camera2api_hal3"
+diff --git a/app/src/main/res/values/arrays.xml b/app/src/main/res/values/arrays.xml
+new file mode 100644
+index 0000000..dcfaadd
+--- /dev/null
++++ b/app/src/main/res/values/arrays.xml
+@@ -0,0 +1,21 @@
++<?xml version="1.0" encoding="utf-8"?>
++
++<!-- All lists for ListPreference keys/values are placed here -->
++<resources>
++    <array name="pref_misc_display_refresh_rate">
++        <item>"10 Hz"</item>
++        <item>"24 Hz"</item>
++        <item>"48 Hz"</item>
++        <item>"60 Hz"</item>
++        <item>"96 Hz"</item>
++        <item>"120 Hz"</item>
++    </array>
++    <array name="pref_misc_refresh_rate_values">
++        <item>"10"</item>
++        <item>"24"</item>
++        <item>"48"</item>
++        <item>"60"</item>
++        <item>"96"</item>
++        <item>"120"</item>
++    </array>
++</resources>
+\ No newline at end of file
+diff --git a/app/src/main/res/xml/pref_misc.xml b/app/src/main/res/xml/pref_misc.xml
+index b90d0f0..9f20656 100644
+--- a/app/src/main/res/xml/pref_misc.xml
++++ b/app/src/main/res/xml/pref_misc.xml
+@@ -53,6 +53,18 @@
+ 			android:entryValues="@array/pref_misc_display_fps_values"
+ 			android:key="key_misc_display_fps"
+ 			android:title="Force FPS" />
++			<ListPreference
++			android:defaultValue="10"
++			android:entries="@array/pref_misc_display_refresh_rate"
++			android:entryValues="@array/pref_misc_refresh_rate_values"
++			android:key="key_misc_min_hz"
++			android:title="Minimum refresh rate" />
++			<ListPreference
++			android:defaultValue="120"
++			android:entries="@array/pref_misc_display_refresh_rate"
++			android:entryValues="@array/pref_misc_refresh_rate_values"
++			android:key="key_misc_max_hz"
++			android:title="Maximum refresh rate" />
+         <Preference
+             android:key="key_misc_restart_systemui"
+             android:title="Restart SystemUI"
+-- 
+2.17.1
+

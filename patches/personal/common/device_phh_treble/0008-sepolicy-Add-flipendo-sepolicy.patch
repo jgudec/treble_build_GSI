@@ -1,7 +1,7 @@
-From 04dba44d47295cf10e7d953b27da9cfbfeb88b03 Mon Sep 17 00:00:00 2001
+From c819121071bab7d8bd9a559e035b54e3dce0d7d3 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Thu, 22 Jul 2021 11:35:11 +0100
-Subject: [PATCH 08/11] sepolicy: Add flipendo sepolicy
+Subject: [PATCH 08/10] sepolicy: Add flipendo sepolicy
 
 Fix Extreme Battery Saver SELinux denials
 ---

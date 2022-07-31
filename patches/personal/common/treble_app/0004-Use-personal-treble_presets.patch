@@ -1,7 +1,7 @@
-From 9d524351cfbe30babffa4e678a60bae336e50cf3 Mon Sep 17 00:00:00 2001
+From 713802f206f0f22315ae9f9e6bae417c38a983a0 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Thu, 14 Jul 2022 17:25:43 +0100
-Subject: [PATCH] Use personal treble_presets
+Subject: [PATCH 4/9] Use personal treble_presets
 
 ---
  app/src/main/java/me/phh/treble/app/PresetDownloader.kt | 2 +-

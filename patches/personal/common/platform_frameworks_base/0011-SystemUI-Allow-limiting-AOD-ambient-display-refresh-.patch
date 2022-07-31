@@ -1,0 +1,101 @@
+From c1a7fcf33c2bd6601f2cfd1868b5ad4512f7f679 Mon Sep 17 00:00:00 2001
+From: John Galt <johngaltfirstrun@gmail.com>
+Date: Fri, 29 Jul 2022 09:57:30 +0100
+Subject: [PATCH] SystemUI: Allow limiting AOD & ambient display refresh rate
+ via overlay
+
+This should save some juice while showing it.
+AOSP has implementation for keyguard & AOD but lack AOD only -
+We still want to show keyguard at max rate to allow better UX
+
+This feature should behave fine with config_keyguardMaxRefreshRate and/or config_keyguardPrefferedRefreshRate set
+and thus allows setting a different rate for each.
+
+Change-Id: I935e870ac78e98893ecba2a9d1570b4f204208aa
+---
+ packages/SystemUI/res/values/config.xml       |  3 +++
+ ...NotificationShadeWindowControllerImpl.java | 22 +++++++++++++++++++
+ 2 files changed, 25 insertions(+)
+
+diff --git a/packages/SystemUI/res/values/config.xml b/packages/SystemUI/res/values/config.xml
+index 42b5653569ec..8d5b238d3bea 100644
+--- a/packages/SystemUI/res/values/config.xml
++++ b/packages/SystemUI/res/values/config.xml
+@@ -671,4 +671,7 @@
+     <!-- Icons that don't show in a collapsed statusbar on keyguard -->
+     <string-array name="config_keyguard_statusbar_icon_blocklist" translatable="false">
+     </string-array>
++
++    <!-- Preferred max refresh rate at AOD & Ambient Display, if supported by the display. -->
++    <integer name="config_aodMaxRefreshRate">-1</integer>
+ </resources>
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/NotificationShadeWindowControllerImpl.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/NotificationShadeWindowControllerImpl.java
+index 8c76a1bf4f83..d4ce67436e6b 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/NotificationShadeWindowControllerImpl.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/NotificationShadeWindowControllerImpl.java
+@@ -89,6 +89,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+     private final long mLockScreenDisplayTimeout;
+     private final float mKeyguardPreferredRefreshRate; // takes precedence over max
+     private final float mKeyguardMaxRefreshRate;
++    private final float mAODMaxRefreshRate;
+     private final KeyguardViewMediator mKeyguardViewMediator;
+     private final KeyguardBypassController mKeyguardBypassController;
+     private final AuthController mAuthController;
+@@ -166,6 +167,11 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+         // know that we're not falsing (because we unlocked.)
+         mKeyguardMaxRefreshRate = context.getResources()
+                 .getInteger(R.integer.config_keyguardMaxRefreshRate);
++
++        // Same as described above but limited to AOD
++        // Allows using a different rate for each
++        mAODMaxRefreshRate = context.getResources()
++                .getInteger(R.integer.config_aodMaxRefreshRate);
+     }
+ 
+     /**
+@@ -283,6 +289,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+                 state.mScrimsVisibility == ScrimController.OPAQUE || state.mLightRevealScrimOpaque;
+         final boolean keyguardOrAod = state.mKeyguardShowing
+                 || (state.mDozing && mDozeParameters.getAlwaysOn());
++        boolean wasKeyguardRateSet = false;        
+         if ((keyguardOrAod && !state.mBackdropShowing && !scrimsOccludingWallpaper)
+                 || mKeyguardViewMediator.isAnimatingBetweenKeyguardAndSurfaceBehindOrWillBe()) {
+             // Show the wallpaper if we're on keyguard/AOD and the wallpaper is not occluded by a
+@@ -307,6 +314,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+                     && mAuthController.isUdfpsEnrolled(KeyguardUpdateMonitor.getCurrentUser())) {
+                 mLpChanged.preferredMaxDisplayRefreshRate = mKeyguardPreferredRefreshRate;
+                 mLpChanged.preferredMinDisplayRefreshRate = mKeyguardPreferredRefreshRate;
++                wasKeyguardRateSet = true;
+             } else {
+                 mLpChanged.preferredMaxDisplayRefreshRate = 0;
+                 mLpChanged.preferredMinDisplayRefreshRate = 0;
+@@ -319,12 +327,26 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+                     && !state.mKeyguardFadingAway && !state.mKeyguardGoingAway;
+             if (state.mDozing || bypassOnKeyguard) {
+                 mLpChanged.preferredMaxDisplayRefreshRate = mKeyguardMaxRefreshRate;
++                wasKeyguardRateSet = true;
+             } else {
+                 mLpChanged.preferredMaxDisplayRefreshRate = 0;
+             }
+             Trace.setCounter("display_max_refresh_rate",
+                     (long) mLpChanged.preferredMaxDisplayRefreshRate);
+         }
++
++        if (mAODMaxRefreshRate > 0) {
++            if (state.mDozing) {
++                // limit on AOD & ambient if we have that set
++                // overrides set max keyguard rate
++                mLpChanged.preferredMaxDisplayRefreshRate = mAODMaxRefreshRate;
++            } else if (!wasKeyguardRateSet) {
++                // un-limit when out, but only if max keyguard rate wasn't set
++                mLpChanged.preferredMaxDisplayRefreshRate = 0;
++            }
++            Trace.setCounter("display_max_refresh_rate",
++                        (long) mLpChanged.preferredMaxDisplayRefreshRate);
++        }
+     }
+ 
+     private void adjustScreenOrientation(State state) {
+-- 
+2.17.1
+

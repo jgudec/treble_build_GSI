@@ -1,17 +1,20 @@
-From b7a589f951f54325d4eea3fab95cdcb92006784e Mon Sep 17 00:00:00 2001
+From b05b6ad1cd7dd9916b69398c99aa9e2fde35fd14 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Tue, 5 Jul 2022 23:18:40 +0100
-Subject: [PATCH 09/11] Implement a dirty fix for Galaxy S22 audio policy
+Date: Thu, 28 Jul 2022 14:21:27 +0100
+Subject: [PATCH 09/10] Include several S22-specific props and fix
 
+Adaptive Refresh Rate props, Audio Policy fix
 ---
  base.mk                                       |   4 +
  ...samsung_s22_audio_policy_configuration.xml | 132 ++++++++++++++++++
  phh-prop-handler.sh                           |   6 +-
- 3 files changed, 138 insertions(+), 4 deletions(-)
+ rw-system.sh                                  |   2 +-
+ system.prop                                   |  13 ++
+ 5 files changed, 152 insertions(+), 5 deletions(-)
  create mode 100644 files/samsung_s22_audio_policy_configuration.xml
 
 diff --git a/base.mk b/base.mk
-index f3fb6c9..2733322 100644
+index f3fb6c9..a777811 100644
 --- a/base.mk
 +++ b/base.mk
 @@ -234,3 +234,7 @@ include build/make/target/product/gsi_release.mk
@@ -19,7 +22,7 @@ index f3fb6c9..2733322 100644
  PRODUCT_COPY_FILES += \
  	device/phh/treble/files/com.android.deskclock_whitelist.xml:system/etc/sysconfig/com.android.deskclock_whitelist.xml
 +
-+# Samsung Galaxy S22 audio policy fix
++# Samsung Galaxy S22 fixes
 +PRODUCT_COPY_FILES += \
 +	device/phh/treble/files/samsung_s22_audio_policy_configuration.xml:system/etc/samsung_s22_audio_policy_configuration.xml
 \ No newline at end of file
@@ -178,6 +181,41 @@ index 4371632..4aa1f1f 100644
          fi
  
          if [ -f /vendor/lib/hw/audio.bluetooth_qti.default.so ];then
+diff --git a/rw-system.sh b/rw-system.sh
+index 468a742..eeda014 100644
+--- a/rw-system.sh
++++ b/rw-system.sh
+@@ -955,7 +955,7 @@ if getprop ro.vendor.build.fingerprint |grep -qiE '^samsung/';then
+     setprop persist.sys.phh.fod.samsung true
+ fi
+ 
+-if getprop ro.vendor.build.fingerprint | grep -q -e samsung/o1s -e samsung/t2s -e samsung/p3s; then
++if getprop ro.vendor.build.fingerprint | grep -q -e samsung/o1s -e samsung/t2s -e samsung/p3s -e samsung/r0s -e samsung/g0s -e samsung/b0s; then
+     setprop persist.sys.phh.ultrasonic_udfps true
+ fi
+ 
+diff --git a/system.prop b/system.prop
+index a6c7ede..46e2b7d 100644
+--- a/system.prop
++++ b/system.prop
+@@ -14,3 +14,16 @@ ro.boot.realme.lockstate=0
+ 
+ #Fixes fingerprint unlock delay
+ persist.wm.enable_remote_keyguard_animation=0
++
++# Enable corner padding by default
++persist.sys.phh.rounded_corners_padding=48
++
++# S22 props
++ro.surface_flinger.vsync_event_phase_offset_ns=2000000
++ro.surface_flinger.vsync_sf_event_phase_offset_ns=1000000
++persist.sys.sf.hs_mode=0
++debug.sf.frame_rate_multiple_threshold=120
++ro.surface_flinger.use_content_detection_for_refresh_rate=true
++ro.surface_flinger.set_idle_timer_ms=2000
++ro.surface_flinger.set_touch_timer_ms=800
++ro.surface_flinger.set_display_power_timer_ms=1500
+\ No newline at end of file
 -- 
 2.17.1
 

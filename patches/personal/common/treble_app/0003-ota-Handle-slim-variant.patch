@@ -1,17 +1,17 @@
-From 6e64d6a080f4a8f41e8972311cab40c0a0009900 Mon Sep 17 00:00:00 2001
+From 3558cc3d092d7205fb7390bce68b4d8cbf90ac43 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Wed, 9 Feb 2022 12:41:30 +0000
-Subject: [PATCH 3/3] ota: Handle slim variant
+Subject: [PATCH 3/9] ota: Handle slim variant
 
 ---
  app/src/main/java/me/phh/treble/app/UpdaterActivity.kt | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/app/src/main/java/me/phh/treble/app/UpdaterActivity.kt b/app/src/main/java/me/phh/treble/app/UpdaterActivity.kt
-index b90bc00..e8de382 100644
+index 12f3834..71b2145 100644
 --- a/app/src/main/java/me/phh/treble/app/UpdaterActivity.kt
 +++ b/app/src/main/java/me/phh/treble/app/UpdaterActivity.kt
-@@ -212,10 +212,10 @@ class UpdaterActivity : PreferenceActivity() {
+@@ -252,10 +252,10 @@ class UpdaterActivity : PreferenceActivity() {
  
      private fun getVariant() : String {
          var flavor = SystemProperties.get("ro.build.flavor").replace(Regex("-user(debug)?"), "")
@@ -26,5 +26,5 @@ index b90bc00..e8de382 100644
              flavor += "-vndklite"
          }
 -- 
-2.32.0
+2.17.1
 

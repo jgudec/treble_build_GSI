@@ -1,14 +1,14 @@
-From c3b4f37f80db421a6757b91e8e6aa87096166c41 Mon Sep 17 00:00:00 2001
+From 07e30cc05d487307b851afd58beb26f7aabcf318 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Tue, 8 Jun 2021 10:03:50 +0100
-Subject: [PATCH 2/3] Remove Customization page
+Subject: [PATCH 2/9] Remove Customization page
 
 ---
- app/src/main/res/xml/pref_headers.xml |  3 -
+ app/src/main/res/xml/pref_headers.xml | 3 ---
  1 file changed, 3 deletions(-)
 
 diff --git a/app/src/main/res/xml/pref_headers.xml b/app/src/main/res/xml/pref_headers.xml
-index 1682a3f..9a4fa2a 100644
+index f74aedf..9c0c7f9 100644
 --- a/app/src/main/res/xml/pref_headers.xml
 +++ b/app/src/main/res/xml/pref_headers.xml
 @@ -38,9 +38,6 @@
@@ -22,5 +22,5 @@ index 1682a3f..9a4fa2a 100644
          android:id="@+id/updater"
          android:title="Updater">
 -- 
-2.25.1
+2.17.1
 
