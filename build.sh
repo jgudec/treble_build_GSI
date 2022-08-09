@@ -93,7 +93,7 @@ buildVariant() {
 
 generatePackages() {
     echo "--> Generating packages"
-	xz -cv $BD/system-treble_arm64_bvN.img -T0 > $BD/"$BUILD"_arm64-ab-12.1-$BUILD_DATE-UNOFFICIAL.img.xz
+	xz -cv $BD/system-treble_arm64_bvN.img -T0 > $BD/"$BUILD"-12.1-Galaxy_S21_S22_Exynos-GSI-$BUILD_DATE-UNOFFICIAL.img.xz
     rm -rf $BD/system-*.img
     echo
 }
