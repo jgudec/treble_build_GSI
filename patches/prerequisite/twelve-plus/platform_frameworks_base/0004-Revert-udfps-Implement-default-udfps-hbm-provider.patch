@@ -1,0 +1,140 @@
+From 95bb5782a00a74ed477be33b607652bdbb2299bf Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sun, 7 Aug 2022 12:25:33 +0100
+Subject: [PATCH 04/11] Revert "udfps: Implement default udfps hbm provider"
+
+This reverts commit df4590abc1f1cbb2f58350ca6844005db1673ba5.
+
+Change-Id: I056fd34cc0075aafb4f7ef3ed14d12b4f5c185a2
+---
+ packages/SystemUI/proguard.flags              |  3 --
+ .../SystemUI/res/values/custom_config.xml     |  3 --
+ .../biometrics/DummyUdfpsHbmProvider.kt       | 32 -------------------
+ .../systemui/biometrics/UdfpsController.java  |  4 +--
+ .../systemui/dagger/SystemUIModule.java       | 14 ++------
+ 5 files changed, 4 insertions(+), 52 deletions(-)
+ delete mode 100644 packages/SystemUI/src/com/android/systemui/biometrics/DummyUdfpsHbmProvider.kt
+
+diff --git a/packages/SystemUI/proguard.flags b/packages/SystemUI/proguard.flags
+index dc3db8d1538a..031678229bbd 100644
+--- a/packages/SystemUI/proguard.flags
++++ b/packages/SystemUI/proguard.flags
+@@ -24,9 +24,6 @@
+ -keep class com.android.systemui.tv.TvSystemUIFactory
+ -keep class * extends com.android.systemui.SystemUI
+ -keep class * implements com.android.systemui.SystemUI$Injector
+--keep class * implements com.android.systemui.biometrics.UdfpsHbmProvider {
+-    public <init>(...);
+-}
+ 
+ -keepclasseswithmembers class * {
+     public <init>(android.content.Context, android.util.AttributeSet);
+diff --git a/packages/SystemUI/res/values/custom_config.xml b/packages/SystemUI/res/values/custom_config.xml
+index 39dc3a9d6851..03d3bb2e0ff5 100644
+--- a/packages/SystemUI/res/values/custom_config.xml
++++ b/packages/SystemUI/res/values/custom_config.xml
+@@ -26,9 +26,6 @@
+     <bool name="config_statusBarBurnInProtection">false</bool>
+     <integer name="config_shift_interval">60</integer>
+ 
+-    <!-- Udfps HBM provider class name -->
+-    <string name="config_udfpsHbmProviderComponent">com.android.systemui.biometrics.DummyUdfpsHbmProvider</string>
+-
+     <!-- SystemUI Google -->
+     <bool name="flag_smartspace">true</bool>
+     <string name="config_systemUIFactoryComponent">org.pixelexperience.systemui.SystemUIGoogleFactory</string>
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/DummyUdfpsHbmProvider.kt b/packages/SystemUI/src/com/android/systemui/biometrics/DummyUdfpsHbmProvider.kt
+deleted file mode 100644
+index a1ec9c2bb76e..000000000000
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/DummyUdfpsHbmProvider.kt
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/*
+- * Copyright (C) 2022 The LineageOS Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package com.android.systemui.biometrics
+-
+-import android.content.Context
+-import android.view.Surface
+-
+-class DummyUdfpsHbmProvider constructor(
+-    private val context: Context
+-): UdfpsHbmProvider {
+-    override fun enableHbm(hbmType: Int, surface: Surface?, onHbmEnabled: Runnable?) {
+-        onHbmEnabled?.run()
+-    }
+-
+-    override fun disableHbm(onHbmDisabled: Runnable?) {
+-        onHbmDisabled?.run()
+-    }
+-}
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+index 48883e3c4ebc..6d8db4b570eb 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+@@ -598,7 +598,7 @@ public class UdfpsController implements DozeReceiver {
+             @NonNull ScreenLifecycle screenLifecycle,
+             @Nullable Vibrator vibrator,
+             @NonNull UdfpsHapticsSimulator udfpsHapticsSimulator,
+-            @NonNull UdfpsHbmProvider hbmProvider,
++            @NonNull Optional<UdfpsHbmProvider> hbmProvider,
+             @NonNull KeyguardStateController keyguardStateController,
+             @NonNull KeyguardBypassController keyguardBypassController,
+             @NonNull DisplayManager displayManager,
+@@ -627,7 +627,7 @@ public class UdfpsController implements DozeReceiver {
+         mPowerManager = powerManager;
+         mAccessibilityManager = accessibilityManager;
+         mLockscreenShadeTransitionController = lockscreenShadeTransitionController;
+-        mHbmProvider = hbmProvider;
++        mHbmProvider = hbmProvider.orElse(null);
+         screenLifecycle.addObserver(mScreenObserver);
+         mScreenOn = screenLifecycle.getScreenState() == ScreenLifecycle.SCREEN_ON;
+         mKeyguardBypassController = keyguardBypassController;
+diff --git a/packages/SystemUI/src/com/android/systemui/dagger/SystemUIModule.java b/packages/SystemUI/src/com/android/systemui/dagger/SystemUIModule.java
+index 8adaa98e1a13..12786f278a16 100644
+--- a/packages/SystemUI/src/com/android/systemui/dagger/SystemUIModule.java
++++ b/packages/SystemUI/src/com/android/systemui/dagger/SystemUIModule.java
+@@ -83,7 +83,6 @@ import com.android.systemui.util.time.SystemClock;
+ import com.android.systemui.util.time.SystemClockImpl;
+ import com.android.systemui.wallet.dagger.WalletModule;
+ import com.android.systemui.wmshell.BubblesManager;
+-import com.android.systemui.R;
+ import com.android.wm.shell.bubbles.Bubbles;
+ 
+ import java.util.Optional;
+@@ -176,17 +175,8 @@ public abstract class SystemUIModule {
+     @BindsOptionalOf
+     abstract StatusBar optionalStatusBar();
+ 
+-    @Provides
+-    static UdfpsHbmProvider getUdfpsHbmProvider(Context context) {
+-        String className = context.getString(R.string.config_udfpsHbmProviderComponent);
+-        try {
+-            Class<?> clazz = context.getClassLoader().loadClass(className);
+-            return (UdfpsHbmProvider) clazz.getDeclaredConstructor(
+-                    new Class[] { Context.class }).newInstance(context);
+-        } catch (Throwable t) {
+-            throw new RuntimeException("Error loading UdfpsHbmProvider " + className, t);
+-        }
+-    }
++    @BindsOptionalOf
++    abstract UdfpsHbmProvider optionalUdfpsHbmProvider();
+ 
+     @SysUISingleton
+     @Binds
+-- 
+2.17.1
+

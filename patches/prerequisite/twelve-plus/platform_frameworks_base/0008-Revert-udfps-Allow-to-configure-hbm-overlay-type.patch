@@ -1,0 +1,60 @@
+From 23861a7a0bcba920aef5f502a3591e5e46038049 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sun, 7 Aug 2022 12:33:14 +0100
+Subject: [PATCH 08/11] Revert "udfps: Allow to configure hbm overlay type"
+
+This reverts commit 54b9678a2e20134a4588cf2e7615c997a421d2fc.
+
+Change-Id: Id513d102a90304aaef13868bc2c7b49e6a5559b5
+---
+ packages/SystemUI/res/values/custom_config.xml             | 7 +------
+ .../src/com/android/systemui/biometrics/UdfpsView.java     | 3 +--
+ 2 files changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/packages/SystemUI/res/values/custom_config.xml b/packages/SystemUI/res/values/custom_config.xml
+index 2589813f5672..763dfbfbd99c 100644
+--- a/packages/SystemUI/res/values/custom_config.xml
++++ b/packages/SystemUI/res/values/custom_config.xml
+@@ -6,12 +6,6 @@
+     <!-- Color of the UDFPS pressed view -->
+     <color name="config_udfpsColor">#ffffffff</color>
+ 
+-    <!-- HBM type of UDFPS overlay.
+-            0 - GLOBAL HBM
+-            1 - LOCAL HBM
+-    -->
+-    <integer name="config_udfps_hbm_type">1</integer>
+-
+     <!-- If not zero, limits the internal screen recorder's framerate to the set value. -->
+     <integer name="config_screenRecorderMaxFramerate">0</integer>
+ 
+@@ -44,4 +38,5 @@
+ 
+     <!-- Doze: does the long press sensor need a proximity check? -->
+     <bool name="doze_long_press_proximity_check">false</bool>
++
+ </resources>
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java
+index ab2050dfef5f..30e5aed2f8d8 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java
+@@ -51,7 +51,7 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+ 
+     private static final String SETTING_HBM_TYPE =
+             "com.android.systemui.biometrics.UdfpsSurfaceView.hbmType";
+-    private static @HbmType int DEFAULT_HBM_TYPE;
++    private static final @HbmType int DEFAULT_HBM_TYPE = UdfpsHbmTypes.LOCAL_HBM;
+ 
+     private static final int DEBUG_TEXT_SIZE_PX = 32;
+ 
+@@ -97,7 +97,6 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+         mOnIlluminatedDelayMs = mContext.getResources().getInteger(
+                 com.android.internal.R.integer.config_udfps_illumination_transition_ms);
+ 
+-        DEFAULT_HBM_TYPE = mContext.getResources().getInteger(R.integer.config_udfps_hbm_type);
+         if (Build.IS_ENG || Build.IS_USERDEBUG) {
+             mHbmType = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                     SETTING_HBM_TYPE, DEFAULT_HBM_TYPE, UserHandle.USER_CURRENT);
+-- 
+2.17.1
+

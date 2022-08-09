@@ -1,0 +1,161 @@
+From 77710331ca1f3e140f59f2b915d351f730958aa0 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sun, 7 Aug 2022 12:22:34 +0100
+Subject: [PATCH 02/11] Revert "udfps: Implement framework dimming support"
+
+This reverts commit 35279a480ad30d469242acd36ffb51bc573b4dc2.
+
+Change-Id: Id3d3a984ecef06b76ce743ceabd64b5cda04e0fb
+---
+ .../SystemUI/res/values/custom_config.xml     | 25 ---------
+ .../systemui/biometrics/UdfpsController.java  | 56 -------------------
+ 2 files changed, 81 deletions(-)
+
+diff --git a/packages/SystemUI/res/values/custom_config.xml b/packages/SystemUI/res/values/custom_config.xml
+index d8e9d630c11e..39dc3a9d6851 100644
+--- a/packages/SystemUI/res/values/custom_config.xml
++++ b/packages/SystemUI/res/values/custom_config.xml
+@@ -46,31 +46,6 @@
+     <!-- Allow devices override audio panel location to the left side -->
+     <bool name="config_audioPanelOnLeftSide">false</bool>
+ 
+-    <!-- Flag to enable framework dimming for udfps -->
+-    <bool name="config_udfpsFrameworkDimming">false</bool>
+-
+-    <!-- Array of brightness-alpha lut for framework dimming -->
+-    <string-array name="config_udfpsDimmingBrightnessAlphaArray" translatable="false">
+-          <!-- Example:
+-          <item>0,255</item>
+-          <item>1,234</item>
+-          <item>3,227</item>
+-          <item>8,208</item>
+-          <item>16,192</item>
+-          <item>27,176</item>
+-          <item>41,160</item>
+-          <item>61,144</item>
+-          <item>80,128</item>
+-          <item>104,112</item>
+-          <item>130,96</item>
+-          <item>158,80</item>
+-          <item>188,64</item>
+-          <item>221,48</item>
+-          <item>250,36</item>
+-          <item>255,33</item>
+-          -->
+-    </string-array>
+-
+     <!-- Body font family -->
+     <string name="config_bodyFontFamily">@*android:string/config_bodyFontFamily</string>
+ 
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+index 84698dc060df..ea732278fa93 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+@@ -48,7 +48,6 @@ import android.os.Trace;
+ import android.os.VibrationEffect;
+ import android.os.Vibrator;
+ import android.os.UserHandle;
+-import android.provider.Settings;
+ import android.util.Log;
+ import android.view.Gravity;
+ import android.view.LayoutInflater;
+@@ -170,9 +169,6 @@ public class UdfpsController implements DozeReceiver {
+     private final int mUdfpsVendorCode;
+     private Set<Callback> mCallbacks = new HashSet<>();
+ 
+-    private boolean mFrameworkDimming;
+-    private int[][] mBrightnessAlphaArray;
+-
+     private boolean mCutoutMasked;
+     private int mStatusbarHeight;
+ 
+@@ -665,11 +661,6 @@ public class UdfpsController implements DozeReceiver {
+         mCoreLayoutParams.layoutInDisplayCutoutMode =
+                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
+         mCoreLayoutParams.privateFlags = WindowManager.LayoutParams.PRIVATE_FLAG_TRUSTED_OVERLAY;
+-        mCoreLayoutParams.dimAmount = 0;
+-
+-        mFrameworkDimming = mContext.getResources().getBoolean(R.bool.config_udfpsFrameworkDimming);
+-
+-        parseBrightnessAlphaArray();
+ 
+         mFingerprintManager.setUdfpsOverlayController(new UdfpsOverlayController());
+ 
+@@ -763,7 +754,6 @@ public class UdfpsController implements DozeReceiver {
+         final int cutoutMaskedExtra = mCutoutMasked ? mStatusbarHeight : 0;
+ 
+         mCoreLayoutParams.flags = Utils.FINGERPRINT_OVERLAY_LAYOUT_PARAM_FLAGS
+-                | WindowManager.LayoutParams.FLAG_DIM_BEHIND
+                 | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH;
+         if (animation != null && animation.listenForTouchesOutsideView()) {
+             mCoreLayoutParams.flags |= WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+@@ -1050,8 +1040,6 @@ public class UdfpsController implements DozeReceiver {
+             return;
+         }
+ 
+-        updateViewDimAmount(true);
+-
+         if (mView.getAnimationViewController() instanceof UdfpsKeyguardViewController
+                 && !mStatusBarStateController.isDozing()) {
+             mKeyguardBypassController.setUserHasDeviceEntryIntent(true);
+@@ -1096,7 +1084,6 @@ public class UdfpsController implements DozeReceiver {
+         if (mView.isIlluminationRequested()) {
+             mView.stopIllumination();
+         }
+-        updateViewDimAmount(false);
+     }
+ 
+     private void updateTouchListener() {
+@@ -1113,49 +1100,6 @@ public class UdfpsController implements DozeReceiver {
+         }
+     }
+ 
+-    private static int interpolate(int x, int xa, int xb, int ya, int yb) {
+-        return ya - (ya - yb) * (x - xa) / (xb - xa);
+-    }
+-
+-    private void updateViewDimAmount(boolean pressed) {
+-        if (mFrameworkDimming) {
+-            if (pressed) {
+-                int curBrightness = Settings.System.getInt(mContext.getContentResolver(),
+-                        Settings.System.SCREEN_BRIGHTNESS, 100);
+-                int i, dimAmount;
+-                for (i = 0; i < mBrightnessAlphaArray.length; i++) {
+-                    if (mBrightnessAlphaArray[i][0] >= curBrightness) break;
+-                }
+-                if (i == 0) {
+-                    dimAmount = mBrightnessAlphaArray[i][1];
+-                } else if (i == mBrightnessAlphaArray.length) {
+-                    dimAmount = mBrightnessAlphaArray[i-1][1];
+-                } else {
+-                    dimAmount = interpolate(curBrightness,
+-                            mBrightnessAlphaArray[i][0], mBrightnessAlphaArray[i-1][0],
+-                            mBrightnessAlphaArray[i][1], mBrightnessAlphaArray[i-1][1]);
+-                }
+-                mCoreLayoutParams.dimAmount = dimAmount / 255.0f;
+-            } else {
+-                mCoreLayoutParams.dimAmount = 0;
+-            }
+-            mWindowManager.updateViewLayout(mView, mCoreLayoutParams);
+-        }
+-    }
+-
+-    private void parseBrightnessAlphaArray() {
+-        if (mFrameworkDimming) {
+-            String[] array = mContext.getResources().getStringArray(
+-                    R.array.config_udfpsDimmingBrightnessAlphaArray);
+-            mBrightnessAlphaArray = new int[array.length][2];
+-            for (int i = 0; i < array.length; i++) {
+-                String[] s = array[i].split(",");
+-                mBrightnessAlphaArray[i][0] = Integer.parseInt(s[0]);
+-                mBrightnessAlphaArray[i][1] = Integer.parseInt(s[1]);
+-            }
+-        }
+-    }
+-
+     /**
+      * Callback for fingerUp and fingerDown events.
+      */
+-- 
+2.17.1
+

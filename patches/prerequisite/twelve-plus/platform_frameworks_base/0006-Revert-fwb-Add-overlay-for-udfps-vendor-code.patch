@@ -1,0 +1,67 @@
+From a6a7c25cd193fa4bd3cee18b4ec2eb4ac7565164 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sun, 7 Aug 2022 12:31:56 +0100
+Subject: [PATCH 06/11] Revert "fwb: Add overlay for udfps vendor code"
+
+This reverts commit 7d55fcafba6a9b6305ab15cda6efcdb66056fc8b.
+
+Change-Id: I02972c362aab997378513d20e341059b17a70466
+---
+ packages/SystemUI/res/values/custom_config.xml              | 4 ----
+ .../com/android/systemui/biometrics/UdfpsController.java    | 6 +-----
+ 2 files changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/packages/SystemUI/res/values/custom_config.xml b/packages/SystemUI/res/values/custom_config.xml
+index 5b1d1e4a26ac..2589813f5672 100644
+--- a/packages/SystemUI/res/values/custom_config.xml
++++ b/packages/SystemUI/res/values/custom_config.xml
+@@ -12,9 +12,6 @@
+     -->
+     <integer name="config_udfps_hbm_type">1</integer>
+ 
+-    <!-- Udfps vendor code -->
+-    <integer name="config_udfps_vendor_code">0</integer>
+-
+     <!-- If not zero, limits the internal screen recorder's framerate to the set value. -->
+     <integer name="config_screenRecorderMaxFramerate">0</integer>
+ 
+@@ -47,5 +44,4 @@
+ 
+     <!-- Doze: does the long press sensor need a proximity check? -->
+     <bool name="doze_long_press_proximity_check">false</bool>
+-
+ </resources>
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+index 8ce71c71925d..26405a8ebcec 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+@@ -164,7 +164,6 @@ public class UdfpsController implements DozeReceiver {
+     private Runnable mAodInterruptRunnable;
+     private boolean mOnFingerDown;
+     private boolean mAttemptedToDismissKeyguard;
+-    private final int mUdfpsVendorCode;
+     private Set<Callback> mCallbacks = new HashSet<>();
+ 
+     @VisibleForTesting
+@@ -326,7 +325,7 @@ public class UdfpsController implements DozeReceiver {
+         public void onAcquired(int sensorId, int acquiredInfo, int vendorCode) {
+             mFgExecutor.execute(() -> {
+                 if (acquiredInfo == 6 && (mStatusBarStateController.isDozing() || !mScreenOn)) {
+-                    if (vendorCode == mUdfpsVendorCode) {
++                    if (vendorCode == 22) { // Use overlay to determine pressed vendor code?
+                         mPowerManager.wakeUp(mSystemClock.uptimeMillis(),
+                                 PowerManager.WAKE_REASON_GESTURE, TAG);
+                         onAodInterrupt(0, 0, 0, 0); // To-Do pass proper values
+@@ -659,9 +658,6 @@ public class UdfpsController implements DozeReceiver {
+         context.registerReceiver(mBroadcastReceiver, filter);
+ 
+         udfpsHapticsSimulator.setUdfpsController(this);
+-
+-        mUdfpsVendorCode = mContext.getResources().getInteger(R.integer.config_udfps_vendor_code);
+-
+     }
+ 
+     /**
+-- 
+2.17.1
+
