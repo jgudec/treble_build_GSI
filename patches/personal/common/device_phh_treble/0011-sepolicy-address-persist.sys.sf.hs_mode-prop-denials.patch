@@ -1,7 +1,7 @@
-From 6c3350b249d7cb6b7f836451a6112cf7d208ccfe Mon Sep 17 00:00:00 2001
+From 7fa32154f30e96f6c3563fc304d0adca0f9ad03a Mon Sep 17 00:00:00 2001
 From: haridhayal11 <haridhayal@gmail.com>
 Date: Sun, 7 Aug 2022 16:08:04 +0530
-Subject: [PATCH] sepolicy: address persist.sys.sf.hs_mode prop denials
+Subject: [PATCH 11/13] sepolicy: address persist.sys.sf.hs_mode prop denials
 
 ---
  sepolicy/property_contexts | 1 +
@@ -30,5 +30,5 @@ index 63f4edc..344372c 100644
 +
 +get_prop(hal_graphics_composer_default, sf_hs_mode_prop);
 -- 
-2.37.1
+2.17.1
 

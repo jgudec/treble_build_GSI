@@ -1,6 +1,6 @@
-From 6bed03643df867426301fafd83544627699994ad Mon Sep 17 00:00:00 2001
+From c270d5facaf55361e076fb5117eb62fc04765541 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 7 Aug 2022 12:22:59 +0100
+Date: Thu, 11 Aug 2022 19:11:59 +0100
 Subject: [PATCH 03/11] Revert "UdfpsController: Fix position if cutout is
  hidden"
 

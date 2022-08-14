@@ -1,11 +1,11 @@
-From 77710331ca1f3e140f59f2b915d351f730958aa0 Mon Sep 17 00:00:00 2001
+From d70a71dbc195cf15d862c96debf7066810700a6a Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 7 Aug 2022 12:22:34 +0100
+Date: Thu, 11 Aug 2022 19:09:00 +0100
 Subject: [PATCH 02/11] Revert "udfps: Implement framework dimming support"
 
 This reverts commit 35279a480ad30d469242acd36ffb51bc573b4dc2.
 
-Change-Id: Id3d3a984ecef06b76ce743ceabd64b5cda04e0fb
+Change-Id: I2b4c71c379754dbb63d3723d31a99f6af29523b7
 ---
  .../SystemUI/res/values/custom_config.xml     | 25 ---------
  .../systemui/biometrics/UdfpsController.java  | 56 -------------------

@@ -1,4 +1,4 @@
-From 3558cc3d092d7205fb7390bce68b4d8cbf90ac43 Mon Sep 17 00:00:00 2001
+From 092c787833df9d67b5e51623dacadce24367c705 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Wed, 9 Feb 2022 12:41:30 +0000
 Subject: [PATCH 3/9] ota: Handle slim variant

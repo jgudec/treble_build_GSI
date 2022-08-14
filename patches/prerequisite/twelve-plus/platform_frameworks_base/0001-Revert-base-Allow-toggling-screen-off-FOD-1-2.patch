@@ -1,9 +1,11 @@
-From ca9d62eb7eb561da9c7a10b6039cb4054eb72504 Mon Sep 17 00:00:00 2001
+From 0b89e77bfb5f9bc2e9374f5b4005d4812052ba83 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 7 Aug 2022 12:20:18 +0100
+Date: Thu, 11 Aug 2022 19:04:10 +0100
 Subject: [PATCH 01/11] Revert "base: Allow toggling screen off FOD [1/2]"
 
 This reverts commit abdf67ed64b93f29dcec2bc596a46001054e4724.
+
+Change-Id: I7ad03a07fcc683d303de45b5bd7965de77f8e327
 ---
  .../display/AmbientDisplayConfiguration.java  |  3 +-
  core/java/android/provider/Settings.java      |  8 -----
@@ -28,10 +30,10 @@ index 79643e32c35c..0b1ed65ef937 100644
  
      /** {@hide} */
 diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
-index 62600fc4a024..74aaef9970ae 100644
+index 59bbc87caed8..345106198402 100644
 --- a/core/java/android/provider/Settings.java
 +++ b/core/java/android/provider/Settings.java
-@@ -10965,14 +10965,6 @@ public final class Settings {
+@@ -10964,14 +10964,6 @@ public final class Settings {
           */
          public static final String QS_SHOW_AUTO_BRIGHTNESS = "qs_show_auto_brightness";
  
@@ -47,7 +49,7 @@ index 62600fc4a024..74aaef9970ae 100644
           * These entries are considered common between the personal and the managed profile,
           * since the managed profile doesn't get to change them.
 diff --git a/core/res/res/values/custom_config.xml b/core/res/res/values/custom_config.xml
-index 9b5b7a6b38a9..0226493e488a 100644
+index c19f1d8a3335..0226493e488a 100644
 --- a/core/res/res/values/custom_config.xml
 +++ b/core/res/res/values/custom_config.xml
 @@ -193,7 +193,4 @@
@@ -55,7 +57,7 @@ index 9b5b7a6b38a9..0226493e488a 100644
      <bool name="config_supportsNetworkTrafficOnStatusBar">true</bool>
  
 -    <!-- Whether devices suports in-display fingerprint when screen is off -->
--    <bool name="config_supportsScreenOffUdfps">true</bool>
+-    <bool name="config_supportsScreenOffUdfps">false</bool>
 -
  </resources>
 diff --git a/core/res/res/values/custom_symbols.xml b/core/res/res/values/custom_symbols.xml

@@ -1,15 +1,15 @@
-From c55f99646abbca77ac510a2828021cf60ba24b12 Mon Sep 17 00:00:00 2001
+From ed2b4f04c046debcb5e81c1f8090aa489c88cc86 Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
-Date: Sat, 4 Sep 2021 08:26:30 +0000
-Subject: [PATCH 24/35] Revert "Switch long-press power behavior in AOSP."
+Date: Thu, 11 Aug 2022 19:53:38 +0100
+Subject: [PATCH] Revert 'Switch long-press power behavior in AOSP.'
 
-This reverts commit 803c77a0a24624111944832098c6f65158051dc4.
+Change-Id: Ib68b0fbdf06a9389f2be4cbb68c6f19dcd95d299
 ---
  core/res/res/values/config.xml | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/core/res/res/values/config.xml b/core/res/res/values/config.xml
-index 2ad2a5cfd285..0cbf95a62cb6 100644
+index 90841ab58a65..5d6b751e5468 100644
 --- a/core/res/res/values/config.xml
 +++ b/core/res/res/values/config.xml
 @@ -978,7 +978,7 @@
@@ -18,7 +18,7 @@ index 2ad2a5cfd285..0cbf95a62cb6 100644
      -->
 -    <integer name="config_longPressOnPowerBehavior">5</integer>
 +    <integer name="config_longPressOnPowerBehavior">1</integer>
-
+ 
      <!-- The time in milliseconds after which a press on power button is considered "long". -->
      <integer name="config_longPressOnPowerDurationMs">500</integer>
 @@ -1010,7 +1010,7 @@
@@ -27,9 +27,9 @@ index 2ad2a5cfd285..0cbf95a62cb6 100644
      -->
 -    <integer name="config_keyChordPowerVolumeUp">2</integer>
 +    <integer name="config_keyChordPowerVolumeUp">1</integer>
-
+ 
      <!-- Allows activities to be launched on a long press on power during device setup. -->
      <bool name="config_allowStartActivityForLongPressOnPowerInSetup">false</bool>
 -- 
-2.25.1
+2.17.1
 

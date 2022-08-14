@@ -1,6 +1,6 @@
-From 7f7612a01fb9ec905e17a7a4702194edf02924d6 Mon Sep 17 00:00:00 2001
+From 3205b55c4e17fd708798755b2a19ac7bf33f3951 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 7 Aug 2022 12:34:11 +0100
+Date: Thu, 11 Aug 2022 19:26:33 +0100
 Subject: [PATCH 10/11] Revert "udfps: Add support for udfps on aod without
  having dedicated sensor"
 

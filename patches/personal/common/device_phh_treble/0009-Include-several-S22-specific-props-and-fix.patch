@@ -1,16 +1,16 @@
-From b05b6ad1cd7dd9916b69398c99aa9e2fde35fd14 Mon Sep 17 00:00:00 2001
+From b01aea91a6dd72c1e49b5f99ad313c34079a1c02 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Thu, 28 Jul 2022 14:21:27 +0100
-Subject: [PATCH 09/10] Include several S22-specific props and fix
+Subject: [PATCH 09/13] Include several S22-specific props and fix
 
 Adaptive Refresh Rate props, Audio Policy fix
 ---
  base.mk                                       |   4 +
  ...samsung_s22_audio_policy_configuration.xml | 132 ++++++++++++++++++
  phh-prop-handler.sh                           |   6 +-
- rw-system.sh                                  |   2 +-
- system.prop                                   |  13 ++
- 5 files changed, 152 insertions(+), 5 deletions(-)
+ rw-system.sh                                  |  12 +-
+ system.prop                                   |  18 +++
+ 5 files changed, 167 insertions(+), 5 deletions(-)
  create mode 100644 files/samsung_s22_audio_policy_configuration.xml
 
 diff --git a/base.mk b/base.mk
@@ -182,23 +182,34 @@ index 4371632..4aa1f1f 100644
  
          if [ -f /vendor/lib/hw/audio.bluetooth_qti.default.so ];then
 diff --git a/rw-system.sh b/rw-system.sh
-index 468a742..eeda014 100644
+index 468a742..689dc10 100644
 --- a/rw-system.sh
 +++ b/rw-system.sh
-@@ -955,7 +955,7 @@ if getprop ro.vendor.build.fingerprint |grep -qiE '^samsung/';then
+@@ -955,8 +955,18 @@ if getprop ro.vendor.build.fingerprint |grep -qiE '^samsung/';then
      setprop persist.sys.phh.fod.samsung true
  fi
  
 -if getprop ro.vendor.build.fingerprint | grep -q -e samsung/o1s -e samsung/t2s -e samsung/p3s; then
 +if getprop ro.vendor.build.fingerprint | grep -q -e samsung/o1s -e samsung/t2s -e samsung/p3s -e samsung/r0s -e samsung/g0s -e samsung/b0s; then
      setprop persist.sys.phh.ultrasonic_udfps true
++
++    echo 404000 > /sys/kernel/gpu/gpu_min_clock
++
++    echo static > /sys/kernel/gpu/gpu_governor
++
++    resetprop_phh ro.surface_flinger.set_idle_timer_ms 1000
++
++    resetprop_phh ro.surface_flinger.set_touch_timer_ms 400
++
++    resetprop_phh ro.surface_flinger.set_display_power_timer_ms 5000
  fi
  
+ if getprop ro.vendor.build.fingerprint |grep -qiE -e ASUS_I006D -e ASUS_I003;then
 diff --git a/system.prop b/system.prop
-index a6c7ede..46e2b7d 100644
+index a6c7ede..aed6d73 100644
 --- a/system.prop
 +++ b/system.prop
-@@ -14,3 +14,16 @@ ro.boot.realme.lockstate=0
+@@ -14,3 +14,21 @@ ro.boot.realme.lockstate=0
  
  #Fixes fingerprint unlock delay
  persist.wm.enable_remote_keyguard_animation=0
@@ -207,15 +218,19 @@ index a6c7ede..46e2b7d 100644
 +persist.sys.phh.rounded_corners_padding=48
 +
 +# S22 props
-+ro.surface_flinger.vsync_event_phase_offset_ns=2000000
-+ro.surface_flinger.vsync_sf_event_phase_offset_ns=1000000
 +persist.sys.sf.hs_mode=0
 +debug.sf.frame_rate_multiple_threshold=120
 +ro.surface_flinger.use_content_detection_for_refresh_rate=true
-+ro.surface_flinger.set_idle_timer_ms=2000
-+ro.surface_flinger.set_touch_timer_ms=800
-+ro.surface_flinger.set_display_power_timer_ms=1500
-\ No newline at end of file
++
++#visual_tweak
++debug.sf.hw=0
++debug.egl.hw=0
++debug.enable.sglscale=1
++debug.sf.enable_hwc_vds=1
++debug.gralloc.enable_fb_ubwc=1
++debug.sf.latch_unsignaled=1
++debug.sf.recomputecrop=0
++dev.pm.dyn_samplingrate=1
 -- 
 2.17.1
 

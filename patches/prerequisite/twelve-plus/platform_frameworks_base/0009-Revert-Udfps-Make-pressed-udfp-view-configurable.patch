@@ -1,16 +1,16 @@
-From 4df5b80e301639943b565792cc161ac698ab04e6 Mon Sep 17 00:00:00 2001
+From 53156aa3ec501f3c37a5f899d4ae4b4946652280 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 7 Aug 2022 12:33:59 +0100
+Date: Thu, 11 Aug 2022 19:26:19 +0100
 Subject: [PATCH 09/11] Revert "Udfps: Make pressed udfp view configurable"
 
 This reverts commit 90533b8c5cda4efc341e17cf0e0bf64c21f90bc8.
 
-Change-Id: Ia5a5fcedf3584aff68dc40a1ebd257b18fec58a2
+Change-Id: Ibeac19340d62574e2e23bda0195a29a0d7f99b14
 ---
  .../res/drawable-nodpi/udfps_icon_pressed.png   | Bin 108 -> 0 bytes
- packages/SystemUI/res/values/custom_config.xml  |   4 ----
+ packages/SystemUI/res/values/custom_config.xml  |   3 ---
  .../systemui/biometrics/UdfpsSurfaceView.java   |  16 +---------------
- 3 files changed, 1 insertion(+), 19 deletions(-)
+ 3 files changed, 1 insertion(+), 18 deletions(-)
  delete mode 100644 packages/SystemUI/res/drawable-nodpi/udfps_icon_pressed.png
 
 diff --git a/packages/SystemUI/res/drawable-nodpi/udfps_icon_pressed.png b/packages/SystemUI/res/drawable-nodpi/udfps_icon_pressed.png
@@ -26,7 +26,7 @@ z&)mfH)S%SFl*+=BsWw1Ge4Z|jAr-fh5*U~o7?>FtSQ!{^cTT<plwt66^>bP0l+XkK
 D@OB!I
 
 diff --git a/packages/SystemUI/res/values/custom_config.xml b/packages/SystemUI/res/values/custom_config.xml
-index 763dfbfbd99c..41a53ac4ea3c 100644
+index 763dfbfbd99c..910752f85fe8 100644
 --- a/packages/SystemUI/res/values/custom_config.xml
 +++ b/packages/SystemUI/res/values/custom_config.xml
 @@ -3,9 +3,6 @@
@@ -39,12 +39,6 @@ index 763dfbfbd99c..41a53ac4ea3c 100644
      <!-- If not zero, limits the internal screen recorder's framerate to the set value. -->
      <integer name="config_screenRecorderMaxFramerate">0</integer>
  
-@@ -38,5 +35,4 @@
- 
-     <!-- Doze: does the long press sensor need a proximity check? -->
-     <bool name="doze_long_press_proximity_check">false</bool>
--
- </resources>
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsSurfaceView.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsSurfaceView.java
 index 71e33a699934..77fad35d32d4 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsSurfaceView.java

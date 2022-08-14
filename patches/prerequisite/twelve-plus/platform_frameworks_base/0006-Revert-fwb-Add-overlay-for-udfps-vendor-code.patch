@@ -1,18 +1,18 @@
-From a6a7c25cd193fa4bd3cee18b4ec2eb4ac7565164 Mon Sep 17 00:00:00 2001
+From 057715e9ec864cf0e1b9ad0de95ad1c4443192ef Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 7 Aug 2022 12:31:56 +0100
+Date: Thu, 11 Aug 2022 19:19:58 +0100
 Subject: [PATCH 06/11] Revert "fwb: Add overlay for udfps vendor code"
 
 This reverts commit 7d55fcafba6a9b6305ab15cda6efcdb66056fc8b.
 
-Change-Id: I02972c362aab997378513d20e341059b17a70466
+Change-Id: I7dea5dbb7b181c76fe16cd6f856ae6d8f3fff843
 ---
- packages/SystemUI/res/values/custom_config.xml              | 4 ----
+ packages/SystemUI/res/values/custom_config.xml              | 3 ---
  .../com/android/systemui/biometrics/UdfpsController.java    | 6 +-----
- 2 files changed, 1 insertion(+), 9 deletions(-)
+ 2 files changed, 1 insertion(+), 8 deletions(-)
 
 diff --git a/packages/SystemUI/res/values/custom_config.xml b/packages/SystemUI/res/values/custom_config.xml
-index 5b1d1e4a26ac..2589813f5672 100644
+index 5b1d1e4a26ac..bb0b133fd91e 100644
 --- a/packages/SystemUI/res/values/custom_config.xml
 +++ b/packages/SystemUI/res/values/custom_config.xml
 @@ -12,9 +12,6 @@
@@ -25,12 +25,6 @@ index 5b1d1e4a26ac..2589813f5672 100644
      <!-- If not zero, limits the internal screen recorder's framerate to the set value. -->
      <integer name="config_screenRecorderMaxFramerate">0</integer>
  
-@@ -47,5 +44,4 @@
- 
-     <!-- Doze: does the long press sensor need a proximity check? -->
-     <bool name="doze_long_press_proximity_check">false</bool>
--
- </resources>
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
 index 8ce71c71925d..26405a8ebcec 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java

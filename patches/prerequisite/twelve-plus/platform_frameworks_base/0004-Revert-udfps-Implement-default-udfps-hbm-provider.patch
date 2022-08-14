@@ -1,11 +1,11 @@
-From 95bb5782a00a74ed477be33b607652bdbb2299bf Mon Sep 17 00:00:00 2001
+From cbd1d793fa7bd9e72f6613ff7803e9b6d5087d9d Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 7 Aug 2022 12:25:33 +0100
+Date: Thu, 11 Aug 2022 19:16:40 +0100
 Subject: [PATCH 04/11] Revert "udfps: Implement default udfps hbm provider"
 
 This reverts commit df4590abc1f1cbb2f58350ca6844005db1673ba5.
 
-Change-Id: I056fd34cc0075aafb4f7ef3ed14d12b4f5c185a2
+Change-Id: I52a01a39d14a6570b1f247345a00feb6727c1e4f
 ---
  packages/SystemUI/proguard.flags              |  3 --
  .../SystemUI/res/values/custom_config.xml     |  3 --

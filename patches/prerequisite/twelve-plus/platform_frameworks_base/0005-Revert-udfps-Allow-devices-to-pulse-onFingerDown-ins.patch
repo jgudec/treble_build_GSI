@@ -1,12 +1,12 @@
-From 0907e9bc7212398422312dc26d2166e3fe211423 Mon Sep 17 00:00:00 2001
+From cd31dc8360a39cb640d994c1b02da7527d248edc Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 7 Aug 2022 12:26:41 +0100
+Date: Thu, 11 Aug 2022 19:18:41 +0100
 Subject: [PATCH 05/11] Revert "udfps: Allow devices to pulse onFingerDown
  instead of waking the screen"
 
 This reverts commit 4dd25ef03b928bd0bd6059afeb1e115e974d74fb.
 
-Change-Id: I6d15d523a23c23f7386be8bcc31f1f54cb17bd55
+Change-Id: Iaaa85863d7d017c7d431fffe4f2d5299c04a2c87
 ---
  packages/SystemUI/res/values/custom_config.xml        |  4 ----
  .../android/systemui/biometrics/UdfpsController.java  | 11 ++---------

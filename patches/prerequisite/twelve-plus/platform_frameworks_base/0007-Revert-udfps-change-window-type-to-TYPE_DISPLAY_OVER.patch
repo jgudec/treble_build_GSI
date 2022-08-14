@@ -1,6 +1,6 @@
-From ad5e9a704cf38693c6d3f71871378dc4810a7d55 Mon Sep 17 00:00:00 2001
+From c8e32bf915e24db8300ae3386ca3188e6eb5f723 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 7 Aug 2022 12:32:11 +0100
+Date: Thu, 11 Aug 2022 19:21:52 +0100
 Subject: [PATCH 07/11] Revert "udfps: change window type to
  TYPE_DISPLAY_OVERLAY"
 

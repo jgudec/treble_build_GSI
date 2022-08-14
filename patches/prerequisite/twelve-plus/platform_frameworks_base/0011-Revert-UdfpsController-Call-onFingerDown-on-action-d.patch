@@ -1,6 +1,6 @@
-From 8d7eee430c18b4dcf1a62a0667807f98689c2dd2 Mon Sep 17 00:00:00 2001
+From 5c49d7f601b8b740b52745ece47ebf7878d7ff27 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 7 Aug 2022 12:34:27 +0100
+Date: Thu, 11 Aug 2022 19:27:20 +0100
 Subject: [PATCH 11/11] Revert "UdfpsController: Call onFingerDown on action
  down events"
 

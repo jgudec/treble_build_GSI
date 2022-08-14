@@ -1,4 +1,4 @@
-From 0bb624058fee7c93b4a18b75b23a83cb25108b11 Mon Sep 17 00:00:00 2001
+From eeca8cc85953568358bad5f5b64814e4455cc3ec Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Thu, 14 Jul 2022 17:26:13 +0100
 Subject: [PATCH 5/9] Fix Gradle's JVM path
