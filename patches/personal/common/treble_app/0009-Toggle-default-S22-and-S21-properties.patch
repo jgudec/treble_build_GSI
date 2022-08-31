@@ -1,6 +1,6 @@
-From fbf89a91ccb47ad76e7cc0d6b4228658c4c9faf8 Mon Sep 17 00:00:00 2001
+From e3effa5c1f4c8852ed171168ec6a01a2a6f3bfa1 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sun, 31 Jul 2022 08:29:49 +0100
+Date: Wed, 31 Aug 2022 22:01:30 +0200
 Subject: [PATCH 9/9] Toggle default S22 and S21 properties
 
 ---
@@ -10,10 +10,10 @@ Subject: [PATCH 9/9] Toggle default S22 and S21 properties
  3 files changed, 38 insertions(+), 2 deletions(-)
 
 diff --git a/app/src/main/java/me/phh/treble/app/Misc.kt b/app/src/main/java/me/phh/treble/app/Misc.kt
-index e2136e1..61d12f4 100644
+index 7ed780d..9935a8b 100644
 --- a/app/src/main/java/me/phh/treble/app/Misc.kt
 +++ b/app/src/main/java/me/phh/treble/app/Misc.kt
-@@ -270,5 +270,26 @@ object Misc: EntryStartup {
+@@ -295,5 +295,26 @@ object Misc: EntryStartup {
          spListener.onSharedPreferenceChanged(sp, MiscSettings.dt2w)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.minHz)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.maxHz)
@@ -67,20 +67,20 @@ index 16e2379..5942f5d 100644
  
      companion object: EntryStartup {
 diff --git a/app/src/main/res/xml/pref_misc.xml b/app/src/main/res/xml/pref_misc.xml
-index 9f20656..e291ace 100644
+index fd6674a..856dd37 100644
 --- a/app/src/main/res/xml/pref_misc.xml
 +++ b/app/src/main/res/xml/pref_misc.xml
 @@ -54,13 +54,13 @@
  			android:key="key_misc_display_fps"
  			android:title="Force FPS" />
- 			<ListPreference
+ 		<ListPreference
 -			android:defaultValue="10"
 +			android:defaultValue="-1"
  			android:entries="@array/pref_misc_display_refresh_rate"
  			android:entryValues="@array/pref_misc_refresh_rate_values"
  			android:key="key_misc_min_hz"
  			android:title="Minimum refresh rate" />
- 			<ListPreference
+ 		<ListPreference
 -			android:defaultValue="120"
 +			android:defaultValue="-1"
  			android:entries="@array/pref_misc_display_refresh_rate"

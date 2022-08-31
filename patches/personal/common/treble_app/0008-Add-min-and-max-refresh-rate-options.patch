@@ -1,6 +1,6 @@
-From 67e585538a93caf8b8552a00929bacbca3a41bde Mon Sep 17 00:00:00 2001
+From 8bd4ba190736c36e429a6e4a0ea2045ac06e1fc0 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sat, 30 Jul 2022 10:27:35 +0100
+Date: Wed, 31 Aug 2022 21:58:32 +0200
 Subject: [PATCH 8/9] Add min and max refresh rate options
 
 ---
@@ -12,12 +12,12 @@ Subject: [PATCH 8/9] Add min and max refresh rate options
  create mode 100644 app/src/main/res/values/arrays.xml
 
 diff --git a/app/src/main/java/me/phh/treble/app/Misc.kt b/app/src/main/java/me/phh/treble/app/Misc.kt
-index bcbbc6e..e2136e1 100644
+index 0cdb728..7ed780d 100644
 --- a/app/src/main/java/me/phh/treble/app/Misc.kt
 +++ b/app/src/main/java/me/phh/treble/app/Misc.kt
-@@ -178,6 +178,16 @@ object Misc: EntryStartup {
-                     forceFps(value)
-                 }
+@@ -257,6 +257,16 @@ object Misc: EntryStartup {
+                 val value = sp.getString(key, "00ff00")
+                 SystemProperties.set("persist.sys.phh.fod_color", value)
              }
 +            MiscSettings.minHz -> {
 +                val value = sp.getString(key, "-1").toInt()
@@ -29,10 +29,10 @@ index bcbbc6e..e2136e1 100644
 +                    Settings.System.putInt(c.contentResolver,
 +                        "PEAK_REFRESH_RATE".toLowerCase(), value);
 +            }
-             MiscSettings.remotectl -> {
-                 val value = sp.getBoolean(key, false)
-                 SystemProperties.set("persist.sys.phh.remote", if (value) "true" else "false")
-@@ -258,5 +268,7 @@ object Misc: EntryStartup {
+         }
+     }
+ 
+@@ -283,5 +293,7 @@ object Misc: EntryStartup {
          spListener.onSharedPreferenceChanged(sp, MiscSettings.noHwcomposer)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.storageFUSE)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.dt2w)
@@ -41,21 +41,21 @@ index bcbbc6e..e2136e1 100644
      }
  }
 diff --git a/app/src/main/java/me/phh/treble/app/MiscSettings.kt b/app/src/main/java/me/phh/treble/app/MiscSettings.kt
-index ab5bc3b..11beafe 100644
+index 99593c9..9d75f78 100644
 --- a/app/src/main/java/me/phh/treble/app/MiscSettings.kt
 +++ b/app/src/main/java/me/phh/treble/app/MiscSettings.kt
-@@ -12,6 +12,8 @@ object MiscSettings : Settings {
-     val mobileSignal = "key_misc_mobile_signal"
-     val fpsDivisor = "key_misc_fps_divisor"
-     val displayFps = "key_misc_display_fps"
+@@ -38,6 +38,8 @@ object MiscSettings : Settings {
+     val dt2w = "key_misc_dt2w"
+     val restartSystemUI = "key_misc_restart_systemui"
+     val fodColor = "key_misc_fod_color"
 +    val minHz = "key_misc_min_hz"
 +    val maxHz = "key_misc_max_hz"
-     val maxAspectRatioPreO = "key_misc_max_aspect_ratio_pre_o"
-     val multiCameras = "key_misc_multi_camera"
-     val forceCamera2APIHAL3 = "key_misc_force_camera2api_hal3"
+ 
+     override fun enabled() = true
+ }
 diff --git a/app/src/main/res/values/arrays.xml b/app/src/main/res/values/arrays.xml
 new file mode 100644
-index 0000000..dcfaadd
+index 0000000..dd24c1d
 --- /dev/null
 +++ b/app/src/main/res/values/arrays.xml
 @@ -0,0 +1,21 @@
@@ -82,20 +82,20 @@ index 0000000..dcfaadd
 +</resources>
 \ No newline at end of file
 diff --git a/app/src/main/res/xml/pref_misc.xml b/app/src/main/res/xml/pref_misc.xml
-index b90d0f0..9f20656 100644
+index b90d0f0..fd6674a 100644
 --- a/app/src/main/res/xml/pref_misc.xml
 +++ b/app/src/main/res/xml/pref_misc.xml
 @@ -53,6 +53,18 @@
  			android:entryValues="@array/pref_misc_display_fps_values"
  			android:key="key_misc_display_fps"
  			android:title="Force FPS" />
-+			<ListPreference
++		<ListPreference
 +			android:defaultValue="10"
 +			android:entries="@array/pref_misc_display_refresh_rate"
 +			android:entryValues="@array/pref_misc_refresh_rate_values"
 +			android:key="key_misc_min_hz"
 +			android:title="Minimum refresh rate" />
-+			<ListPreference
++		<ListPreference
 +			android:defaultValue="120"
 +			android:entries="@array/pref_misc_display_refresh_rate"
 +			android:entryValues="@array/pref_misc_refresh_rate_values"

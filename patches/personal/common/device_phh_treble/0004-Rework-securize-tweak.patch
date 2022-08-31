@@ -1,7 +1,7 @@
-From 53156dc75953fd1c1c857a04e745e1ef027fcc69 Mon Sep 17 00:00:00 2001
+From 411ef61a5eb649a7616527325ffad589be520525 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Wed, 25 Dec 2019 12:34:05 +0200
-Subject: [PATCH 04/13] Rework securize tweak
+Subject: [PATCH 04/11] Rework securize tweak
 
 ---
  base.mk      |  1 -
@@ -21,7 +21,7 @@ index 70e6a30..f3fb6c9 100644
  
  PRODUCT_COPY_FILES += \
 diff --git a/rw-system.sh b/rw-system.sh
-index 2173b91..468a742 100644
+index b1aafca..a3b6258 100644
 --- a/rw-system.sh
 +++ b/rw-system.sh
 @@ -724,35 +724,59 @@ copyprop() {

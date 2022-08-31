@@ -1,16 +1,16 @@
-From b01aea91a6dd72c1e49b5f99ad313c34079a1c02 Mon Sep 17 00:00:00 2001
+From 0c2fad9e50043f9809905e41f1b98b62995ba22a Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Thu, 28 Jul 2022 14:21:27 +0100
-Subject: [PATCH 09/13] Include several S22-specific props and fix
+Subject: [PATCH 09/11] Include several S22-specific props and fix
 
 Adaptive Refresh Rate props, Audio Policy fix
 ---
  base.mk                                       |   4 +
  ...samsung_s22_audio_policy_configuration.xml | 132 ++++++++++++++++++
  phh-prop-handler.sh                           |   6 +-
- rw-system.sh                                  |  12 +-
+ rw-system.sh                                  |  11 +-
  system.prop                                   |  18 +++
- 5 files changed, 167 insertions(+), 5 deletions(-)
+ 5 files changed, 166 insertions(+), 5 deletions(-)
  create mode 100644 files/samsung_s22_audio_policy_configuration.xml
 
 diff --git a/base.mk b/base.mk
@@ -182,10 +182,10 @@ index 4371632..4aa1f1f 100644
  
          if [ -f /vendor/lib/hw/audio.bluetooth_qti.default.so ];then
 diff --git a/rw-system.sh b/rw-system.sh
-index 468a742..689dc10 100644
+index a3b6258..d43cb17 100644
 --- a/rw-system.sh
 +++ b/rw-system.sh
-@@ -955,8 +955,18 @@ if getprop ro.vendor.build.fingerprint |grep -qiE '^samsung/';then
+@@ -955,8 +955,17 @@ if getprop ro.vendor.build.fingerprint |grep -qiE '^samsung/';then
      setprop persist.sys.phh.fod.samsung true
  fi
  
@@ -195,13 +195,12 @@ index 468a742..689dc10 100644
 +
 +    echo 404000 > /sys/kernel/gpu/gpu_min_clock
 +
-+    echo static > /sys/kernel/gpu/gpu_governor
-+
 +    resetprop_phh ro.surface_flinger.set_idle_timer_ms 1000
 +
-+    resetprop_phh ro.surface_flinger.set_touch_timer_ms 400
++    resetprop_phh ro.surface_flinger.set_touch_timer_ms 800
 +
-+    resetprop_phh ro.surface_flinger.set_display_power_timer_ms 5000
++    resetprop_phh ro.surface_flinger.set_display_power_timer_ms 4000
++
  fi
  
  if getprop ro.vendor.build.fingerprint |grep -qiE -e ASUS_I006D -e ASUS_I003;then

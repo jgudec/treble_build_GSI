@@ -1,4 +1,4 @@
-From 7d9ad373a1683ba2c5eb4e088b205a4d030bcbfe Mon Sep 17 00:00:00 2001
+From 2dfc2dae0258fa7c8f373ff43679bd695101b771 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Thu, 14 Jul 2022 17:34:26 +0100
 Subject: [PATCH 6/9] Remove OTA Updater #1

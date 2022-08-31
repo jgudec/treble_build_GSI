@@ -49,7 +49,7 @@ applyPatches() {
 	
 	echo "--> Downloading GCam Go"
 	cd $BL/gcam_go
-	[ ! -f gcam_go.apk ] && curl -LO https://dl.dropboxusercontent.com/s/eq748jqyd33ytj2/gcam_go.apk
+	[ ! -f gcam_go.apk ] && curl -LO https://dl.dropboxusercontent.com/s/5f288fvtk1qunfw/gcam_go.apk
 	cd ../..
 	
 

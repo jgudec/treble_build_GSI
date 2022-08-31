@@ -1,0 +1,1078 @@
+From b1f2440a09b00850f18d34692d4d4d2c70e4c398 Mon Sep 17 00:00:00 2001
+From: Vania Desmonda <vaniadesmonda@google.com>
+Date: Thu, 16 Dec 2021 14:07:19 +0000
+Subject: [PATCH] Add wallpaper dimming SystemAPI and implementation for
+ handling dimming set by multiple applications.
+
+Handle lock screen dimming regardless if it shares the same wallpaper
+with the system to apply composite keyguard + additional dimming.
+
+Test: manual testing and unit tests
+Bug: 202841384
+Change-Id: Iabd665e9a8e377185b123494eac2198a4436b0c6
+CTS-Coverage-Bug: 213426781
+---
+ core/api/system-current.txt                   |   3 +
+ core/api/system-lint-baseline.txt             |  10 +
+ core/java/android/app/IWallpaperManager.aidl  |  23 +++
+ core/java/android/app/WallpaperColors.java    |  48 ++++-
+ core/java/android/app/WallpaperManager.java   |  59 ++++++
+ .../service/wallpaper/IWallpaperEngine.aidl   |   1 +
+ .../service/wallpaper/WallpaperService.java   |  67 ++++++-
+ .../android/internal/graphics/ColorUtils.java |   5 +-
+ core/res/AndroidManifest.xml                  |   5 +
+ .../statusbar/phone/ScrimController.java      |  35 +++-
+ .../systemui/statusbar/phone/StatusBar.java   |  21 +-
+ .../wallpaper/WallpaperManagerService.java    | 188 +++++++++++++++++-
+ .../WallpaperManagerShellCommand.java         |  95 +++++++++
+ .../WallpaperManagerServiceTests.java         |  12 ++
+ 14 files changed, 543 insertions(+), 29 deletions(-)
+ create mode 100644 services/core/java/com/android/server/wallpaper/WallpaperManagerShellCommand.java
+
+diff --git a/core/api/system-current.txt b/core/api/system-current.txt
+index 3aa17f0865b4..f1ee378d9d6a 100644
+--- a/core/api/system-current.txt
++++ b/core/api/system-current.txt
+@@ -268,6 +268,7 @@ package android {
+     field public static final String SET_SCREEN_COMPATIBILITY = "android.permission.SET_SCREEN_COMPATIBILITY";
+     field public static final String SET_VOLUME_KEY_LONG_PRESS_LISTENER = "android.permission.SET_VOLUME_KEY_LONG_PRESS_LISTENER";
+     field public static final String SET_WALLPAPER_COMPONENT = "android.permission.SET_WALLPAPER_COMPONENT";
++    field public static final String SET_WALLPAPER_DIM_AMOUNT = "android.permission.SET_WALLPAPER_DIM_AMOUNT";
+     field public static final String SHOW_KEYGUARD_MESSAGE = "android.permission.SHOW_KEYGUARD_MESSAGE";
+     field public static final String SHUTDOWN = "android.permission.SHUTDOWN";
+     field public static final String SIGNAL_REBOOT_READINESS = "android.permission.SIGNAL_REBOOT_READINESS";
+@@ -914,8 +915,10 @@ package android.app {
+ 
+   public class WallpaperManager {
+     method @RequiresPermission(android.Manifest.permission.INTERACT_ACROSS_USERS_FULL) public void clearWallpaper(int, int);
++    method @RequiresPermission(android.Manifest.permission.SET_WALLPAPER_DIM_AMOUNT) public float getWallpaperDimAmount();
+     method public void setDisplayOffset(android.os.IBinder, int, int);
+     method @RequiresPermission(android.Manifest.permission.SET_WALLPAPER_COMPONENT) public boolean setWallpaperComponent(android.content.ComponentName);
++    method @RequiresPermission(android.Manifest.permission.SET_WALLPAPER_DIM_AMOUNT) public void setWallpaperDimAmount(@FloatRange(from=0.0f, to=1.0f) float);
+   }
+ 
+ }
+diff --git a/core/api/system-lint-baseline.txt b/core/api/system-lint-baseline.txt
+index b435acfccde8..798e2f78936b 100644
+--- a/core/api/system-lint-baseline.txt
++++ b/core/api/system-lint-baseline.txt
+@@ -99,6 +99,16 @@ ProtectedMember: android.service.notification.NotificationAssistantService#attac
+ 
+ 
+ 
++RethrowRemoteException: android.app.WallpaperManager#getWallpaperDimAmount():
++    Methods calling system APIs should rethrow `RemoteException` as `RuntimeException` (but do not list it in the throws clause)
++RethrowRemoteException: android.app.WallpaperManager#getWallpaperDimmingAmount():
++    Methods calling system APIs should rethrow `RemoteException` as `RuntimeException` (but do not list it in the throws clause)
++RethrowRemoteException: android.app.WallpaperManager#setWallpaperDimAmount(float):
++    Methods calling system APIs should rethrow `RemoteException` as `RuntimeException` (but do not list it in the throws clause)
++RethrowRemoteException: android.app.WallpaperManager#setWallpaperDimmingAmount(float):
++    Methods calling system APIs should rethrow `RemoteException` as `RuntimeException` (but do not list it in the throws clause)
++
++
+ SamShouldBeLast: android.accounts.AccountManager#addAccount(String, String, String[], android.os.Bundle, android.app.Activity, android.accounts.AccountManagerCallback<android.os.Bundle>, android.os.Handler):
+ 
+ SamShouldBeLast: android.accounts.AccountManager#addOnAccountsUpdatedListener(android.accounts.OnAccountsUpdateListener, android.os.Handler, boolean):
+diff --git a/core/java/android/app/IWallpaperManager.aidl b/core/java/android/app/IWallpaperManager.aidl
+index 4f7c6841d6bb..28c273ec50a6 100644
+--- a/core/java/android/app/IWallpaperManager.aidl
++++ b/core/java/android/app/IWallpaperManager.aidl
+@@ -204,4 +204,27 @@ interface IWallpaperManager {
+      * @hide
+      */
+     void notifyGoingToSleep(int x, int y, in Bundle extras);
++
++    /**
++     * Sets the wallpaper dim amount between [0f, 1f] which would be blended with the system default
++     * dimming. 0f doesn't add any additional dimming and 1f makes the wallpaper fully black.
++     *
++     * @hide
++     */
++    oneway void setWallpaperDimAmount(float dimAmount);
++
++    /**
++     * Gets the current additional dim amount set on the wallpaper. 0f means no application has
++     * added any dimming on top of the system default dim amount.
++     *
++     * @hide
++     */
++    float getWallpaperDimAmount();
++
++    /**
++     * Whether the lock screen wallpaper is different from the system wallpaper.
++     *
++     * @hide
++     */
++    boolean lockScreenWallpaperExists();
+ }
+diff --git a/core/java/android/app/WallpaperColors.java b/core/java/android/app/WallpaperColors.java
+index 7ef0a19ec44c..067a4c3c047e 100644
+--- a/core/java/android/app/WallpaperColors.java
++++ b/core/java/android/app/WallpaperColors.java
+@@ -16,6 +16,7 @@
+ 
+ package android.app;
+ 
++import android.annotation.FloatRange;
+ import android.annotation.IntDef;
+ import android.annotation.NonNull;
+ import android.annotation.Nullable;
+@@ -27,6 +28,7 @@ import android.graphics.drawable.Drawable;
+ import android.os.Parcel;
+ import android.os.Parcelable;
+ import android.util.Log;
++import android.util.MathUtils;
+ import android.util.Size;
+ 
+ import com.android.internal.graphics.ColorUtils;
+@@ -44,6 +46,7 @@ import java.util.Collections;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Set;
+ 
+ /**
+@@ -173,6 +176,22 @@ public final class WallpaperColors implements Parcelable {
+         if (bitmap == null) {
+             throw new IllegalArgumentException("Bitmap can't be null");
+         }
++        return fromBitmap(bitmap, 0f /* dimAmount */);
++    }
++
++    /**
++     * Constructs {@link WallpaperColors} from a bitmap with dimming applied.
++     * <p>
++     * Main colors will be extracted from the bitmap with dimming taken into account when
++     * calculating dark hints.
++     *
++     * @param bitmap Source where to extract from.
++     * @param dimAmount Wallpaper dim amount
++     * @hide
++     */
++    public static WallpaperColors fromBitmap(@NonNull Bitmap bitmap,
++            @FloatRange (from = 0f, to = 1f) float dimAmount) {
++        Objects.requireNonNull(bitmap, "Bitmap can't be null");
+ 
+         final int bitmapArea = bitmap.getWidth() * bitmap.getHeight();
+         boolean shouldRecycle = false;
+@@ -211,7 +230,7 @@ public final class WallpaperColors implements Parcelable {
+ 
+         }
+ 
+-        int hints = calculateDarkHints(bitmap);
++        int hints = calculateDarkHints(bitmap, dimAmount);
+ 
+         if (shouldRecycle) {
+             bitmap.recycle();
+@@ -507,13 +526,15 @@ public final class WallpaperColors implements Parcelable {
+      * Checks if image is bright and clean enough to support light text.
+      *
+      * @param source What to read.
++     * @param dimAmount How much wallpaper dim amount was applied.
+      * @return Whether image supports dark text or not.
+      */
+-    private static int calculateDarkHints(Bitmap source) {
++    private static int calculateDarkHints(Bitmap source, float dimAmount) {
+         if (source == null) {
+             return 0;
+         }
+ 
++        dimAmount = MathUtils.saturate(dimAmount);
+         int[] pixels = new int[source.getWidth() * source.getHeight()];
+         double totalLuminance = 0;
+         final int maxDarkPixels = (int) (pixels.length * MAX_DARK_AREA);
+@@ -521,24 +542,37 @@ public final class WallpaperColors implements Parcelable {
+         source.getPixels(pixels, 0 /* offset */, source.getWidth(), 0 /* x */, 0 /* y */,
+                 source.getWidth(), source.getHeight());
+ 
++        // Create a new black layer with dimAmount as the alpha to be accounted for when computing
++        // the luminance.
++        int dimmingLayerAlpha = (int) (255 * dimAmount);
++        int blackTransparent = ColorUtils.setAlphaComponent(Color.BLACK, dimmingLayerAlpha);
++
+         // This bitmap was already resized to fit the maximum allowed area.
+         // Let's just loop through the pixels, no sweat!
+         float[] tmpHsl = new float[3];
+         for (int i = 0; i < pixels.length; i++) {
+-            ColorUtils.colorToHSL(pixels[i], tmpHsl);
+-            final float luminance = tmpHsl[2];
+-            final int alpha = Color.alpha(pixels[i]);
++            int pixelColor = pixels[i];
++            ColorUtils.colorToHSL(pixelColor, tmpHsl);
++            final int alpha = Color.alpha(pixelColor);
++
++            // Apply composite colors where the foreground is a black layer with an alpha value of
++            // the dim amount and the background is the wallpaper pixel color.
++            int compositeColors = ColorUtils.compositeColors(blackTransparent, pixelColor);
++
++            // Calculate the adjusted luminance of the dimmed wallpaper pixel color.
++            double adjustedLuminance = ColorUtils.calculateLuminance(compositeColors);
++
+             // Make sure we don't have a dark pixel mass that will
+             // make text illegible.
+             final boolean satisfiesTextContrast = ContrastColorUtil
+-                    .calculateContrast(pixels[i], Color.BLACK) > DARK_PIXEL_CONTRAST;
++                    .calculateContrast(pixelColor, Color.BLACK) > DARK_PIXEL_CONTRAST;
+             if (!satisfiesTextContrast && alpha != 0) {
+                 darkPixels++;
+                 if (DEBUG_DARK_PIXELS) {
+                     pixels[i] = Color.RED;
+                 }
+             }
+-            totalLuminance += luminance;
++            totalLuminance += adjustedLuminance;
+         }
+ 
+         int hints = 0;
+diff --git a/core/java/android/app/WallpaperManager.java b/core/java/android/app/WallpaperManager.java
+index fca4c698c49c..51154b53235d 100644
+--- a/core/java/android/app/WallpaperManager.java
++++ b/core/java/android/app/WallpaperManager.java
+@@ -16,6 +16,7 @@
+ 
+ package android.app;
+ 
++import android.annotation.FloatRange;
+ import android.annotation.IntDef;
+ import android.annotation.NonNull;
+ import android.annotation.Nullable;
+@@ -70,6 +71,7 @@ import android.text.TextUtils;
+ import android.util.ArrayMap;
+ import android.util.ArraySet;
+ import android.util.Log;
++import android.util.MathUtils;
+ import android.util.Pair;
+ import android.view.Display;
+ import android.view.WindowManagerGlobal;
+@@ -1992,6 +1994,63 @@ public class WallpaperManager {
+         return setWallpaperComponent(name, mContext.getUserId());
+     }
+ 
++    /**
++     * Sets the wallpaper dim amount between [0f, 1f] which would be blended with the system default
++     * dimming. 0f doesn't add any additional dimming and 1f makes the wallpaper fully black.
++     *
++     * @hide
++     */
++    @SystemApi
++    @RequiresPermission(android.Manifest.permission.SET_WALLPAPER_DIM_AMOUNT)
++    public void setWallpaperDimAmount(@FloatRange (from = 0f, to = 1f) float dimAmount) {
++        if (sGlobals.mService == null) {
++            Log.w(TAG, "WallpaperService not running");
++            throw new RuntimeException(new DeadSystemException());
++        }
++        try {
++            sGlobals.mService.setWallpaperDimAmount(MathUtils.saturate(dimAmount));
++        } catch (RemoteException e) {
++            throw e.rethrowFromSystemServer();
++        }
++    }
++
++    /**
++     * Gets the current additional dim amount set on the wallpaper. 0f means no application has
++     * added any dimming on top of the system default dim amount.
++     *
++     * @hide
++     */
++    @SystemApi
++    @RequiresPermission(android.Manifest.permission.SET_WALLPAPER_DIM_AMOUNT)
++    public float getWallpaperDimAmount() {
++        if (sGlobals.mService == null) {
++            Log.w(TAG, "WallpaperService not running");
++            throw new RuntimeException(new DeadSystemException());
++        }
++        try {
++            return sGlobals.mService.getWallpaperDimAmount();
++        } catch (RemoteException e) {
++            throw e.rethrowFromSystemServer();
++        }
++    }
++
++    /**
++     * Whether the lock screen wallpaper is different from the system wallpaper.
++     *
++     * @hide
++     */
++    public boolean lockScreenWallpaperExists() {
++        if (sGlobals.mService == null) {
++            Log.w(TAG, "WallpaperService not running");
++            throw new RuntimeException(new DeadSystemException());
++        }
++        try {
++            return sGlobals.mService.lockScreenWallpaperExists();
++        } catch (RemoteException e) {
++            throw e.rethrowFromSystemServer();
++        }
++    }
++
+     /**
+      * Set the live wallpaper.
+      *
+diff --git a/core/java/android/service/wallpaper/IWallpaperEngine.aidl b/core/java/android/service/wallpaper/IWallpaperEngine.aidl
+index 81af6a220444..93d4def2180e 100644
+--- a/core/java/android/service/wallpaper/IWallpaperEngine.aidl
++++ b/core/java/android/service/wallpaper/IWallpaperEngine.aidl
+@@ -46,4 +46,5 @@ interface IWallpaperEngine {
+     oneway void removeLocalColorsAreas(in List<RectF> regions);
+     oneway void addLocalColorsAreas(in List<RectF> regions);
+     SurfaceControl mirrorSurfaceControl();
++    oneway void applyDimming(float dimAmount);
+ }
+diff --git a/core/java/android/service/wallpaper/WallpaperService.java b/core/java/android/service/wallpaper/WallpaperService.java
+index b68717a9b457..aee90e515bcb 100644
+--- a/core/java/android/service/wallpaper/WallpaperService.java
++++ b/core/java/android/service/wallpaper/WallpaperService.java
+@@ -26,6 +26,7 @@ import static android.view.SurfaceControl.METADATA_WINDOW_TYPE;
+ import static android.view.View.SYSTEM_UI_FLAG_VISIBLE;
+ import static android.view.WindowManager.LayoutParams.TYPE_WALLPAPER;
+ 
++import android.animation.ValueAnimator;
+ import android.annotation.FloatRange;
+ import android.annotation.NonNull;
+ import android.annotation.Nullable;
+@@ -160,6 +161,7 @@ public abstract class WallpaperService extends Service {
+     private static final int MSG_ZOOM = 10100;
+     private static final int MSG_SCALE_PREVIEW = 10110;
+     private static final int MSG_REPORT_SHOWN = 10150;
++    private static final int MSG_UPDATE_DIMMING = 10200;
+     private static final List<Float> PROHIBITED_STEPS = Arrays.asList(0f, Float.POSITIVE_INFINITY,
+             Float.NEGATIVE_INFINITY);
+ 
+@@ -168,6 +170,8 @@ public abstract class WallpaperService extends Service {
+     private static final boolean ENABLE_WALLPAPER_DIMMING =
+             SystemProperties.getBoolean("persist.debug.enable_wallpaper_dimming", true);
+ 
++    private static final long DIMMING_ANIMATION_DURATION_MS = 300L;
++
+     private final ArrayList<Engine> mActiveEngines
+             = new ArrayList<Engine>();
+ 
+@@ -222,6 +226,9 @@ public abstract class WallpaperService extends Service {
+         boolean mOffsetsChanged;
+         boolean mFixedSizeAllowed;
+         boolean mShouldDim;
++        // Whether the wallpaper should be dimmed by default (when no additional dimming is applied)
++        // based on its color hints
++        boolean mShouldDimByDefault;
+         int mWidth;
+         int mHeight;
+         int mFormat;
+@@ -273,6 +280,8 @@ public abstract class WallpaperService extends Service {
+         private Context mDisplayContext;
+         private int mDisplayState;
+         private float mWallpaperDimAmount = 0.05f;
++        private float mPreviousWallpaperDimAmount = mWallpaperDimAmount;
++        private float mDefaultDimAmount = mWallpaperDimAmount;
+ 
+         SurfaceControl mSurfaceControl = new SurfaceControl();
+         SurfaceControl mBbqSurfaceControl;
+@@ -850,15 +859,34 @@ public abstract class WallpaperService extends Service {
+                 return;
+             }
+             int colorHints = colors.getColorHints();
+-            boolean shouldDim = ((colorHints & WallpaperColors.HINT_SUPPORTS_DARK_TEXT) == 0
++            mShouldDimByDefault = ((colorHints & WallpaperColors.HINT_SUPPORTS_DARK_TEXT) == 0
+                     && (colorHints & WallpaperColors.HINT_SUPPORTS_DARK_THEME) == 0);
+-            if (shouldDim != mShouldDim) {
+-                mShouldDim = shouldDim;
++
++            // If default dimming value changes and no additional dimming is applied
++            if (mShouldDimByDefault != mShouldDim && mWallpaperDimAmount == 0f) {
++                mShouldDim = mShouldDimByDefault;
+                 updateSurfaceDimming();
+                 updateSurface(false, false, true);
+             }
+         }
+ 
++        /**
++         * Update the dim amount of the wallpaper by updating the surface.
++         *
++         * @param dimAmount Float amount between [0.0, 1.0] to dim the wallpaper.
++         */
++        private void updateWallpaperDimming(float dimAmount) {
++            mPreviousWallpaperDimAmount = mWallpaperDimAmount;
++
++            // Custom dim amount cannot be less than the default dim amount.
++            mWallpaperDimAmount = Math.max(mDefaultDimAmount, dimAmount);
++            // If dim amount is 0f (additional dimming is removed), then the wallpaper should dim
++            // based on its default wallpaper color hints.
++            mShouldDim = dimAmount != 0f || mShouldDimByDefault;
++            updateSurfaceDimming();
++            updateSurface(false, false, true);
++        }
++
+         private void updateSurfaceDimming() {
+             if (!ENABLE_WALLPAPER_DIMMING || mBbqSurfaceControl == null) {
+                 return;
+@@ -867,9 +895,21 @@ public abstract class WallpaperService extends Service {
+             // preview mode.
+             if (!isPreview() && mShouldDim) {
+                 Log.v(TAG, "Setting wallpaper dimming: " + mWallpaperDimAmount);
+-                new SurfaceControl.Transaction()
+-                        .setAlpha(mBbqSurfaceControl, 1 - mWallpaperDimAmount)
+-                        .apply();
++                SurfaceControl.Transaction surfaceControl = new SurfaceControl.Transaction();
++
++                // Animate dimming to gradually change the wallpaper alpha from the previous
++                // dim amount to the new amount only if the dim amount changed.
++                ValueAnimator animator = ValueAnimator.ofFloat(
++                        mPreviousWallpaperDimAmount, mWallpaperDimAmount);
++                animator.setDuration(mPreviousWallpaperDimAmount == mWallpaperDimAmount
++                        ? 0 : DIMMING_ANIMATION_DURATION_MS);
++                animator.addUpdateListener((ValueAnimator va) -> {
++                    final float dimValue = (float) va.getAnimatedValue();
++                    surfaceControl
++                            .setAlpha(mBbqSurfaceControl, 1 - dimValue)
++                            .apply();
++                });
++                animator.start();
+             } else {
+                 Log.v(TAG, "Setting wallpaper dimming: " + 0);
+                 new SurfaceControl.Transaction()
+@@ -1321,8 +1361,10 @@ public abstract class WallpaperService extends Service {
+             // Use window context of TYPE_WALLPAPER so client can access UI resources correctly.
+             mDisplayContext = createDisplayContext(mDisplay)
+                     .createWindowContext(TYPE_WALLPAPER, null /* options */);
+-            mWallpaperDimAmount = mDisplayContext.getResources().getFloat(
++            mDefaultDimAmount = mDisplayContext.getResources().getFloat(
+                     com.android.internal.R.dimen.config_wallpaperDimAmount);
++            mWallpaperDimAmount = mDefaultDimAmount;
++            mPreviousWallpaperDimAmount = mWallpaperDimAmount;
+             mDisplayState = mDisplay.getState();
+ 
+             if (DEBUG) Log.v(TAG, "onCreate(): " + this);
+@@ -1651,7 +1693,7 @@ public abstract class WallpaperService extends Service {
+                     Log.e(TAG, "Error creating page local color bitmap", e);
+                     continue;
+                 }
+-                WallpaperColors color = WallpaperColors.fromBitmap(target);
++                WallpaperColors color = WallpaperColors.fromBitmap(target, mWallpaperDimAmount);
+                 target.recycle();
+                 WallpaperColors currentColor = page.getColors(area);
+ 
+@@ -2185,6 +2227,12 @@ public abstract class WallpaperService extends Service {
+             mDetached.set(true);
+         }
+ 
++        public void applyDimming(float dimAmount) throws RemoteException {
++            Message msg = mCaller.obtainMessageI(MSG_UPDATE_DIMMING,
++                    Float.floatToIntBits(dimAmount));
++            mCaller.sendMessage(msg);
++        }
++
+         public void scalePreview(Rect position) {
+             Message msg = mCaller.obtainMessageO(MSG_SCALE_PREVIEW, position);
+             mCaller.sendMessage(msg);
+@@ -2255,6 +2303,9 @@ public abstract class WallpaperService extends Service {
+                 case MSG_ZOOM:
+                     mEngine.setZoom(Float.intBitsToFloat(message.arg1));
+                     break;
++                case MSG_UPDATE_DIMMING:
++                    mEngine.updateWallpaperDimming(Float.intBitsToFloat(message.arg1));
++                    break;
+                 case MSG_SCALE_PREVIEW:
+                     mEngine.scalePreview((Rect) message.obj);
+                     break;
+diff --git a/core/java/com/android/internal/graphics/ColorUtils.java b/core/java/com/android/internal/graphics/ColorUtils.java
+index 537e797c9bac..dff9551c0c07 100644
+--- a/core/java/com/android/internal/graphics/ColorUtils.java
++++ b/core/java/com/android/internal/graphics/ColorUtils.java
+@@ -62,7 +62,10 @@ public final class ColorUtils {
+         return Color.argb(a, r, g, b);
+     }
+ 
+-    private static int compositeAlpha(int foregroundAlpha, int backgroundAlpha) {
++    /**
++     * Returns the composite alpha of the given foreground and background alpha.
++     */
++    public static int compositeAlpha(int foregroundAlpha, int backgroundAlpha) {
+         return 0xFF - (((0xFF - backgroundAlpha) * (0xFF - foregroundAlpha)) / 0xFF);
+     }
+ 
+diff --git a/core/res/AndroidManifest.xml b/core/res/AndroidManifest.xml
+index d6123a42c6f1..17c174cd4eab 100644
+--- a/core/res/AndroidManifest.xml
++++ b/core/res/AndroidManifest.xml
+@@ -4910,6 +4910,11 @@
+     <permission android:name="android.permission.SET_WALLPAPER_COMPONENT"
+         android:protectionLevel="signature|privileged" />
+ 
++    <!-- @SystemApi Allows applications to set the wallpaper dim amount.
++         @hide. -->
++    <permission android:name="android.permission.SET_WALLPAPER_DIM_AMOUNT"
++        android:protectionLevel="signature|privileged" />
++
+     <!-- @SystemApi Allows applications to read dream settings and dream state.
+          @hide -->
+     <permission android:name="android.permission.READ_DREAM_STATE"
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimController.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimController.java
+index 1077347eab0a..6a306b073d6d 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimController.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimController.java
+@@ -182,6 +182,9 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
+     private GradientColors mColors;
+     private boolean mNeedsDrawableColorUpdate;
+ 
++    private float mAdditionalScrimBehindAlphaKeyguard = 0f;
++    // Combined scrim behind keyguard alpha of default scrim + additional scrim
++    // (if wallpaper dimming is applied).
+     private float mScrimBehindAlphaKeyguard = KEYGUARD_SCRIM_ALPHA;
+     private final float mDefaultScrimAlpha;
+ 
+@@ -437,7 +440,35 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
+         return mState;
+     }
+ 
+-    protected void setScrimBehindValues(float scrimBehindAlphaKeyguard) {
++    /**
++     * Sets the additional scrim behind alpha keyguard that would be blended with the default scrim
++     * by applying alpha composition on both values.
++     *
++     * @param additionalScrimAlpha alpha value of additional scrim behind alpha keyguard.
++     */
++    protected void setAdditionalScrimBehindAlphaKeyguard(float additionalScrimAlpha) {
++        mAdditionalScrimBehindAlphaKeyguard = additionalScrimAlpha;
++    }
++
++    /**
++     * Applies alpha composition to the default scrim behind alpha keyguard and the additional
++     * scrim alpha, and sets this value to the scrim behind alpha keyguard.
++     * This is used to apply additional keyguard dimming on top of the default scrim alpha value.
++     */
++    protected void applyCompositeAlphaOnScrimBehindKeyguard() {
++        int compositeAlpha = ColorUtils.compositeAlpha(
++                (int) (255 * mAdditionalScrimBehindAlphaKeyguard),
++                (int) (255 * KEYGUARD_SCRIM_ALPHA));
++        float keyguardScrimAlpha = (float) compositeAlpha / 255;
++        setScrimBehindValues(keyguardScrimAlpha);
++    }
++
++    /**
++     * Sets the scrim behind alpha keyguard values. This is how much the keyguard will be dimmed.
++     *
++     * @param scrimBehindAlphaKeyguard alpha value of the scrim behind
++     */
++    private void setScrimBehindValues(float scrimBehindAlphaKeyguard) {
+         mScrimBehindAlphaKeyguard = scrimBehindAlphaKeyguard;
+         ScrimState[] states = ScrimState.values();
+         for (int i = 0; i < states.length; i++) {
+@@ -732,7 +763,7 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
+             }
+             if (mUnOcclusionAnimationRunning && mState == ScrimState.KEYGUARD) {
+                 // We're unoccluding the keyguard and don't want to have a bright flash.
+-                mNotificationsAlpha = KEYGUARD_SCRIM_ALPHA;
++                mNotificationsAlpha = mScrimBehindAlphaKeyguard;
+                 mNotificationsTint = ScrimState.KEYGUARD.getNotifTint();
+             }
+         }
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
+index 58fcb13c79cb..0060018dd23b 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
+@@ -3388,16 +3388,29 @@ public class StatusBar extends SystemUI implements
+      * Switches theme from light to dark and vice-versa.
+      */
+     protected void updateTheme() {
++        // Set additional scrim only if the lock and system wallpaper are different to prevent
++        // applying the dimming effect twice.
++        mUiBgExecutor.execute(() -> {
++            float dimAmount = 0f;
++            if (mWallpaperManager.lockScreenWallpaperExists()) {
++                dimAmount = mWallpaperManager.getWallpaperDimAmount();
++            }
++            final float scrimDimAmount = dimAmount;
++            mMainExecutor.execute(() -> {
++                mScrimController.setAdditionalScrimBehindAlphaKeyguard(scrimDimAmount);
++                mScrimController.applyCompositeAlphaOnScrimBehindKeyguard();
++            });
++        });
++
+         // Lock wallpaper defines the color of the majority of the views, hence we'll use it
+         // to set our default theme.
+         final boolean lockDarkText = mColorExtractor.getNeutralColors().supportsDarkText();
+         final int themeResId = lockDarkText ? R.style.Theme_SystemUI_LightWallpaper
+                 : R.style.Theme_SystemUI;
+-        if (mContext.getThemeResId() == themeResId) {
+-            return;
++        if (mContext.getThemeResId() != themeResId) {
++            mContext.setTheme(themeResId);
++            mConfigurationController.notifyThemeChanged();
+         }
+-        mContext.setTheme(themeResId);
+-        mConfigurationController.notifyThemeChanged();
+     }
+ 
+     private void updateDozingState() {
+diff --git a/services/core/java/com/android/server/wallpaper/WallpaperManagerService.java b/services/core/java/com/android/server/wallpaper/WallpaperManagerService.java
+index 15a41f6b3d2c..d5ecb7b9f56d 100644
+--- a/services/core/java/com/android/server/wallpaper/WallpaperManagerService.java
++++ b/services/core/java/com/android/server/wallpaper/WallpaperManagerService.java
+@@ -78,7 +78,9 @@ import android.os.ParcelFileDescriptor;
+ import android.os.Process;
+ import android.os.RemoteCallbackList;
+ import android.os.RemoteException;
++import android.os.ResultReceiver;
+ import android.os.SELinux;
++import android.os.ShellCallback;
+ import android.os.SystemClock;
+ import android.os.UserHandle;
+ import android.os.UserManager;
+@@ -89,6 +91,7 @@ import android.service.wallpaper.IWallpaperService;
+ import android.service.wallpaper.WallpaperService;
+ import android.system.ErrnoException;
+ import android.system.Os;
++import android.util.ArrayMap;
+ import android.util.EventLog;
+ import android.util.Slog;
+ import android.util.SparseArray;
+@@ -419,7 +422,7 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+                 Slog.v(TAG, "notifyWallpaperColorsChangedOnDisplay " + which);
+             }
+ 
+-            needsExtraction = wallpaper.primaryColors == null;
++            needsExtraction = wallpaper.primaryColors == null || wallpaper.mIsColorExtractedFromDim;
+         }
+ 
+         if (needsExtraction) {
+@@ -490,12 +493,17 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+         String cropFile = null;
+         boolean defaultImageWallpaper = false;
+         int wallpaperId;
++        float dimAmount;
++
++        synchronized (mLock) {
++            wallpaper.mIsColorExtractedFromDim = false;
++        }
+ 
+         if (wallpaper.equals(mFallbackWallpaper)) {
+             synchronized (mLock) {
+                 if (mFallbackWallpaper.primaryColors != null) return;
+             }
+-            final WallpaperColors colors = extractDefaultImageWallpaperColors();
++            final WallpaperColors colors = extractDefaultImageWallpaperColors(wallpaper);
+             synchronized (mLock) {
+                 mFallbackWallpaper.primaryColors = colors;
+             }
+@@ -512,18 +520,19 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+                 defaultImageWallpaper = true;
+             }
+             wallpaperId = wallpaper.wallpaperId;
++            dimAmount = wallpaper.mWallpaperDimAmount;
+         }
+ 
+         WallpaperColors colors = null;
+         if (cropFile != null) {
+             Bitmap bitmap = BitmapFactory.decodeFile(cropFile);
+             if (bitmap != null) {
+-                colors = WallpaperColors.fromBitmap(bitmap);
++                colors = WallpaperColors.fromBitmap(bitmap, dimAmount);
+                 bitmap.recycle();
+             }
+         } else if (defaultImageWallpaper) {
+             // There is no crop and source file because this is default image wallpaper.
+-            colors = extractDefaultImageWallpaperColors();
++            colors = extractDefaultImageWallpaperColors(wallpaper);
+         }
+ 
+         if (colors == null) {
+@@ -543,11 +552,13 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+         }
+     }
+ 
+-    private WallpaperColors extractDefaultImageWallpaperColors() {
++    private WallpaperColors extractDefaultImageWallpaperColors(WallpaperData wallpaper) {
+         if (DEBUG) Slog.d(TAG, "Extract default image wallpaper colors");
++        float dimAmount;
+ 
+         synchronized (mLock) {
+             if (mCacheDefaultImageWallpaperColors != null) return mCacheDefaultImageWallpaperColors;
++            dimAmount = wallpaper.mWallpaperDimAmount;
+         }
+ 
+         WallpaperColors colors = null;
+@@ -560,7 +571,7 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+             final BitmapFactory.Options options = new BitmapFactory.Options();
+             final Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
+             if (bitmap != null) {
+-                colors = WallpaperColors.fromBitmap(bitmap);
++                colors = WallpaperColors.fromBitmap(bitmap, dimAmount);
+                 bitmap.recycle();
+             }
+         } catch (OutOfMemoryError e) {
+@@ -958,6 +969,23 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+         boolean wallpaperUpdating;
+         WallpaperObserver wallpaperObserver;
+ 
++        /**
++         * The dim amount to be applied to the wallpaper.
++         */
++        float mWallpaperDimAmount = 0.0f;
++
++        /**
++         * A map to keep track of the dimming set by different applications. The key is the calling
++         * UID and the value is the dim amount.
++         */
++        ArrayMap<Integer, Float> mUidToDimAmount = new ArrayMap<>();
++
++        /**
++         * Whether we need to extract the wallpaper colors again to calculate the dark hints
++         * after dimming is applied.
++         */
++        boolean mIsColorExtractedFromDim;
++
+         /**
+          * List of callbacks registered they should each be notified when the wallpaper is changed.
+          */
+@@ -1498,6 +1526,15 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+                         Slog.w(TAG, "Failed to register local colors areas", e);
+                     }
+                 }
++
++                if (mWallpaper.mWallpaperDimAmount != 0f) {
++                    try {
++                        connector.mEngine.applyDimming(mWallpaper.mWallpaperDimAmount);
++                        notifyWallpaperColorsChanged(mWallpaper, FLAG_SYSTEM);
++                    } catch (RemoteException e) {
++                        Slog.w(TAG, "Failed to dim wallpaper", e);
++                    }
++                }
+             }
+         }
+ 
+@@ -2580,6 +2617,98 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+         if (purgeAreas.size() > 0) engine.removeLocalColorsAreas(purgeAreas);
+     }
+ 
++    /**
++     * Returns true if the lock screen wallpaper exists (different wallpaper from the system)
++     */
++    @Override
++    public boolean lockScreenWallpaperExists() {
++        synchronized (mLock) {
++            return mLockWallpaperMap.get(mCurrentUserId) != null;
++        }
++    }
++
++    /**
++     * Sets wallpaper dim amount for the calling UID. This only applies to FLAG_SYSTEM wallpaper as
++     * the lock screen does not have a wallpaper component, so we use mWallpaperMap.
++     *
++     * @param dimAmount Dim amount which would be blended with the system default dimming.
++     */
++    @Override
++    public void setWallpaperDimAmount(float dimAmount) throws RemoteException {
++        checkPermission(android.Manifest.permission.SET_WALLPAPER_DIM_AMOUNT);
++        int uid = Binder.getCallingUid();
++        final long ident = Binder.clearCallingIdentity();
++        try {
++            synchronized (mLock) {
++                WallpaperData wallpaper = mWallpaperMap.get(mCurrentUserId);
++                WallpaperData lockWallpaper = mLockWallpaperMap.get(mCurrentUserId);
++
++                if (dimAmount == 0.0f) {
++                    wallpaper.mUidToDimAmount.remove(uid);
++                } else {
++                    wallpaper.mUidToDimAmount.put(uid, dimAmount);
++                }
++
++                float maxDimAmount = getHighestDimAmountFromMap(wallpaper.mUidToDimAmount);
++                wallpaper.mWallpaperDimAmount = maxDimAmount;
++                // Also set the dim amount to the lock screen wallpaper if the lock and home screen
++                // do not share the same wallpaper
++                if (lockWallpaper != null) {
++                    lockWallpaper.mWallpaperDimAmount = maxDimAmount;
++                }
++
++                if (wallpaper.connection != null) {
++                    wallpaper.connection.forEachDisplayConnector(connector -> {
++                        if (connector.mEngine != null) {
++                            try {
++                                connector.mEngine.applyDimming(maxDimAmount);
++                            } catch (RemoteException e) {
++                                Slog.w(TAG,
++                                        "Can't apply dimming on wallpaper display connector", e);
++                            }
++                        }
++                    });
++                    // Need to extract colors again to re-calculate dark hints after
++                    // applying dimming.
++                    wallpaper.mIsColorExtractedFromDim = true;
++                    notifyWallpaperColorsChanged(wallpaper, FLAG_SYSTEM);
++                    if (lockWallpaper != null) {
++                        lockWallpaper.mIsColorExtractedFromDim = true;
++                        notifyWallpaperColorsChanged(lockWallpaper, FLAG_LOCK);
++                    }
++                    saveSettingsLocked(wallpaper.userId);
++                }
++            }
++        } finally {
++            Binder.restoreCallingIdentity(ident);
++        }
++    }
++
++    @Override
++    public float getWallpaperDimAmount() {
++        checkPermission(android.Manifest.permission.SET_WALLPAPER_DIM_AMOUNT);
++        synchronized (mLock) {
++            WallpaperData data = mWallpaperMap.get(mCurrentUserId);
++            return data.mWallpaperDimAmount;
++        }
++    }
++
++    /**
++     * Gets the highest dim amount among all the calling UIDs that set the wallpaper dim amount.
++     * Return 0f as default value to indicate no application has dimmed the wallpaper.
++     *
++     * @param uidToDimAmountMap Map of UIDs to dim amounts
++     */
++    private float getHighestDimAmountFromMap(ArrayMap<Integer, Float> uidToDimAmountMap) {
++        float maxDimAmount = 0.0f;
++        for (Map.Entry<Integer, Float> entry : uidToDimAmountMap.entrySet()) {
++            if (entry.getValue() > maxDimAmount) {
++                maxDimAmount = entry.getValue();
++            }
++        }
++        return maxDimAmount;
++    }
++
+     @Override
+     public WallpaperColors getWallpaperColors(int which, int userId, int displayId)
+             throws RemoteException {
+@@ -2606,7 +2735,8 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+             if (wallpaperData == null) {
+                 return null;
+             }
+-            shouldExtract = wallpaperData.primaryColors == null;
++            shouldExtract = wallpaperData.primaryColors == null
++                    || wallpaperData.mIsColorExtractedFromDim;
+         }
+ 
+         if (shouldExtract) {
+@@ -2708,6 +2838,7 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+         lockWP.cropHint.set(sysWP.cropHint);
+         lockWP.allowBackup = sysWP.allowBackup;
+         lockWP.primaryColors = sysWP.primaryColors;
++        lockWP.mWallpaperDimAmount = sysWP.mWallpaperDimAmount;
+ 
+         // Migrate the bitmap files outright; no need to copy
+         try {
+@@ -3235,6 +3366,18 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+             out.attributeInt(null, "paddingBottom", wpdData.mPadding.bottom);
+         }
+ 
++        out.attributeFloat(null, "dimAmount", wallpaper.mWallpaperDimAmount);
++        int dimAmountsCount = wallpaper.mUidToDimAmount.size();
++        out.attributeInt(null, "dimAmountsCount", dimAmountsCount);
++        if (dimAmountsCount > 0) {
++            int index = 0;
++            for (Map.Entry<Integer, Float> entry : wallpaper.mUidToDimAmount.entrySet()) {
++                out.attributeInt(null, "dimUID" + index, entry.getKey());
++                out.attributeFloat(null, "dimValue" + index, entry.getValue());
++                index++;
++            }
++        }
++
+         if (wallpaper.primaryColors != null) {
+             int colorsCount = wallpaper.primaryColors.getMainColors().size();
+             out.attributeInt(null, "colorsCount", colorsCount);
+@@ -3311,6 +3454,10 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+         return parser.getAttributeInt(null, name, defValue);
+     }
+ 
++    private float getAttributeFloat(TypedXmlPullParser parser, String name, float defValue) {
++        return parser.getAttributeFloat(null, name, defValue);
++    }
++
+     /**
+      * Sometimes it is expected the wallpaper map may not have a user's data.  E.g. This could
+      * happen during user switch.  The async user switch observer may not have received
+@@ -3515,6 +3662,17 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+         wpData.mPadding.top = getAttributeInt(parser, "paddingTop", 0);
+         wpData.mPadding.right = getAttributeInt(parser, "paddingRight", 0);
+         wpData.mPadding.bottom = getAttributeInt(parser, "paddingBottom", 0);
++        wallpaper.mWallpaperDimAmount = getAttributeFloat(parser, "dimAmount", 0f);
++        int dimAmountsCount = getAttributeInt(parser, "dimAmountsCount", 0);
++        if (dimAmountsCount > 0) {
++            ArrayMap<Integer, Float> allDimAmounts = new ArrayMap<>(dimAmountsCount);
++            for (int i = 0; i < dimAmountsCount; i++) {
++                int uid = getAttributeInt(parser, "dimUID" + i, 0);
++                float dimValue = getAttributeFloat(parser, "dimValue" + i, 0f);
++                allDimAmounts.put(uid, dimValue);
++            }
++            wallpaper.mUidToDimAmount = allDimAmounts;
++        }
+         int colorsCount = getAttributeInt(parser, "colorsCount", 0);
+         int allColorsCount =  getAttributeInt(parser, "allColorsCount", 0);
+         if (allColorsCount > 0) {
+@@ -3681,6 +3839,14 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+         return false;
+     }
+ 
++    @Override // Binder call
++    public void onShellCommand(FileDescriptor in, FileDescriptor out,
++            FileDescriptor err, String[] args, ShellCallback callback,
++            ResultReceiver resultReceiver) {
++        new WallpaperManagerShellCommand(WallpaperManagerService.this).exec(this, in, out, err,
++                args, callback, resultReceiver);
++    }
++
+     @Override
+     protected void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
+         if (!DumpUtils.checkDumpPermission(mContext, TAG, pw)) return;
+@@ -3708,6 +3874,13 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+                 pw.print("  mName=");  pw.println(wallpaper.name);
+                 pw.print("  mAllowBackup="); pw.println(wallpaper.allowBackup);
+                 pw.print("  mWallpaperComponent="); pw.println(wallpaper.wallpaperComponent);
++                pw.print("  mWallpaperDimAmount="); pw.println(wallpaper.mWallpaperDimAmount);
++                pw.print("  isColorExtracted="); pw.println(wallpaper.mIsColorExtractedFromDim);
++                pw.println("  mUidToDimAmount:");
++                for (Map.Entry<Integer, Float> entry : wallpaper.mUidToDimAmount.entrySet()) {
++                    pw.print("    UID="); pw.print(entry.getKey());
++                    pw.print(" dimAmount="); pw.println(entry.getValue());
++                }
+                 if (wallpaper.connection != null) {
+                     WallpaperConnection conn = wallpaper.connection;
+                     pw.print("  Wallpaper connection ");
+@@ -3739,6 +3912,7 @@ public class WallpaperManagerService extends IWallpaperManager.Stub
+                 pw.print("  mCropHint="); pw.println(wallpaper.cropHint);
+                 pw.print("  mName=");  pw.println(wallpaper.name);
+                 pw.print("  mAllowBackup="); pw.println(wallpaper.allowBackup);
++                pw.print("  mWallpaperDimAmount="); pw.println(wallpaper.mWallpaperDimAmount);
+             }
+             pw.println("Fallback wallpaper state:");
+             pw.print(" User "); pw.print(mFallbackWallpaper.userId);
+diff --git a/services/core/java/com/android/server/wallpaper/WallpaperManagerShellCommand.java b/services/core/java/com/android/server/wallpaper/WallpaperManagerShellCommand.java
+new file mode 100644
+index 000000000000..fc827b40f3a1
+--- /dev/null
++++ b/services/core/java/com/android/server/wallpaper/WallpaperManagerShellCommand.java
+@@ -0,0 +1,95 @@
++/*
++ * Copyright (C) 2021 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.android.server.wallpaper;
++
++import android.os.RemoteException;
++import android.os.ShellCommand;
++import android.util.Log;
++
++import java.io.PrintWriter;
++
++/**
++ * Shell Command class to run adb commands on the wallpaper service
++ */
++public class WallpaperManagerShellCommand extends ShellCommand {
++    private static final String TAG = "WallpaperManagerShellCommand";
++
++    private final WallpaperManagerService mService;
++
++    public WallpaperManagerShellCommand(WallpaperManagerService service) {
++        mService = service;
++    }
++
++    @Override
++    public int onCommand(String cmd) {
++        if (cmd == null) {
++            onHelp();
++            return 1;
++        }
++        switch(cmd) {
++            case "set-dim-amount":
++                return setWallpaperDimAmount();
++            case "get-dim-amount":
++                return getWallpaperDimAmount();
++            case "-h":
++            case "help":
++                onHelp();
++                return 0;
++            default:
++                return handleDefaultCommands(cmd);
++        }
++    }
++
++    @Override
++    public void onHelp() {
++        final PrintWriter pw = getOutPrintWriter();
++        pw.println("Wallpaper manager commands:");
++        pw.println("  help");
++        pw.println("    Print this help text.");
++        pw.println();
++        pw.println("  set-dim-amount DIMMING");
++        pw.println("    Sets the current dimming value to DIMMING (a number between 0 and 1).");
++        pw.println();
++        pw.println("  get-dim-amount");
++        pw.println("    Get the current wallpaper dim amount.");
++    }
++
++    /**
++     * Sets the wallpaper dim amount between [0f, 1f] which would be blended with the system default
++     * dimming. 0f doesn't add any additional dimming and 1f makes the wallpaper fully black.
++     */
++    private int setWallpaperDimAmount() {
++        float dimAmount = Float.parseFloat(getNextArgRequired());
++        try {
++            mService.setWallpaperDimAmount(dimAmount);
++        } catch (RemoteException e) {
++            Log.e(TAG, "Can't set wallpaper dim amount");
++        }
++        getOutPrintWriter().println("Dimming the wallpaper to: " + dimAmount);
++        return 0;
++    }
++
++    /**
++     * Gets the current additional dim amount set on the wallpaper. 0f means no application has
++     * added any dimming on top of the system default dim amount.
++     */
++    private int getWallpaperDimAmount() {
++        float dimAmount = mService.getWallpaperDimAmount();
++        getOutPrintWriter().println("The current wallpaper dim amount is: " + dimAmount);
++        return 0;
++    }
++}
+diff --git a/services/tests/mockingservicestests/src/com/android/server/wallpaper/WallpaperManagerServiceTests.java b/services/tests/mockingservicestests/src/com/android/server/wallpaper/WallpaperManagerServiceTests.java
+index fe23c14a0b95..4362c33e6a0d 100644
+--- a/services/tests/mockingservicestests/src/com/android/server/wallpaper/WallpaperManagerServiceTests.java
++++ b/services/tests/mockingservicestests/src/com/android/server/wallpaper/WallpaperManagerServiceTests.java
+@@ -152,6 +152,9 @@ public class WallpaperManagerServiceTests {
+         sContext.getTestablePermissions().setPermission(
+                 android.Manifest.permission.SET_WALLPAPER,
+                 PackageManager.PERMISSION_GRANTED);
++        sContext.getTestablePermissions().setPermission(
++                android.Manifest.permission.SET_WALLPAPER_DIM_AMOUNT,
++                PackageManager.PERMISSION_GRANTED);
+         doNothing().when(sContext).sendBroadcastAsUser(any(), any());
+ 
+         //Wallpaper components
+@@ -432,6 +435,15 @@ public class WallpaperManagerServiceTests {
+         assertTrue(timestamps[1] > timestamps[0]);
+     }
+ 
++    @Test
++    public void testSetWallpaperDimAmount() throws RemoteException {
++        mService.switchUser(USER_SYSTEM, null);
++        float dimAmount = 0.7f;
++        mService.setWallpaperDimAmount(dimAmount);
++        assertEquals("Getting dim amount should match after setting the dim amount",
++                mService.getWallpaperDimAmount(), dimAmount, 0.0);
++    }
++
+     // Verify that after continue switch user from userId 0 to lastUserId, the wallpaper data for
+     // non-current user must not bind to wallpaper service.
+     private void verifyNoConnectionBeforeLastUser(int lastUserId) {
+-- 
+2.17.1
+

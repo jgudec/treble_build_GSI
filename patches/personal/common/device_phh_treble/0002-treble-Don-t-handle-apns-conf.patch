@@ -1,7 +1,7 @@
-From 698810a647ed0b993aa0fc90ef25b258b30758fc Mon Sep 17 00:00:00 2001
+From d5015259124613130458dfcbf073957fde9a0cd6 Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Sun, 27 Jun 2021 15:37:56 +0000
-Subject: [PATCH 02/13] treble: Don't handle apns-conf
+Subject: [PATCH 02/11] treble: Don't handle apns-conf
 
 PE has its own well-maintained copy
 

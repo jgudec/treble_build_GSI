@@ -1,19 +1,19 @@
-From 0682f13c2d7cc72cd57c76b727e71da2b61035d8 Mon Sep 17 00:00:00 2001
+From 8256301ec710a286eb9114569511ca72307478f8 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Fri, 12 Aug 2022 08:57:10 +0100
-Subject: [PATCH 12/13] Address some sepolicy denials
+Subject: [PATCH 11/11] Address some sepolicy denials
 
 ---
- sepolicy/unknown.te | 139 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 139 insertions(+)
+ sepolicy/unknown.te | 169 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 169 insertions(+)
  create mode 100644 sepolicy/unknown.te
 
 diff --git a/sepolicy/unknown.te b/sepolicy/unknown.te
 new file mode 100644
-index 0000000..761a1f1
+index 0000000..74a0e34
 --- /dev/null
 +++ b/sepolicy/unknown.te
-@@ -0,0 +1,139 @@
+@@ -0,0 +1,169 @@
 +allow audioserver vendor_default_prop:file {read};
 +
 +allow priv_app gmscore_app:file {read open};
@@ -153,6 +153,36 @@ index 0000000..761a1f1
 +type hal_audio_default, domain;
 +
 +allow hal_audio_default system_suspend_hwservice:hwservice_manager {find};
++
++allow system_suspend sysfs_ss_writable:file {read};
++
++allow rild system_prop:file {map};
++
++allow system_app qemu_hw_prop:file {getattr};
++
++allow system_app system_suspend:binder {call};
++
++allow system_app system_suspend_control_internal_service:service_manager {find};
++
++allow system_app tracingproxy_service:service_manager {find};
++
++type hal_hdcp_default, domain;
++
++allow system_app hal_hdcp_default:binder {call};
++
++allow hal_camera_default system_prop:file {open getattr};
++
++allow system_suspend sysfs_ss_writable:file {open};
++
++type mediacodec, domain;
++
++allow mediacodec default_prop:file {read};
++
++allow hal_camera_default default_prop:file {getattr};
++
++allow system_suspend sysfs_ss_writable:file {getattr};
++
++allow system_app qemu_hw_prop:file {map};
 -- 
 2.17.1
 

@@ -1,8 +1,8 @@
-From c1a7fcf33c2bd6601f2cfd1868b5ad4512f7f679 Mon Sep 17 00:00:00 2001
+From bd5d01ac5a4f32015dec3b38d267cb77e9252321 Mon Sep 17 00:00:00 2001
 From: John Galt <johngaltfirstrun@gmail.com>
 Date: Fri, 29 Jul 2022 09:57:30 +0100
-Subject: [PATCH] SystemUI: Allow limiting AOD & ambient display refresh rate
- via overlay
+Subject: [PATCH 5/6] SystemUI: Allow limiting AOD & ambient display refresh
+ rate via overlay
 
 This should save some juice while showing it.
 AOSP has implementation for keyguard & AOD but lack AOD only -
