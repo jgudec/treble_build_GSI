@@ -1,4 +1,4 @@
-From 0c2fad9e50043f9809905e41f1b98b62995ba22a Mon Sep 17 00:00:00 2001
+From b372ac74f30ec237f563fcc0368ca789898d5ba1 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Thu, 28 Jul 2022 14:21:27 +0100
 Subject: [PATCH 09/11] Include several S22-specific props and fix

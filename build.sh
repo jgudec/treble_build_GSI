@@ -47,12 +47,6 @@ applyPatches() {
     bash $BL/apply-patches.sh $BL prerequisite $BRANCH
     echo
 	
-	echo "--> Downloading GCam Go"
-	cd $BL/gcam_go
-	[ ! -f gcam_go.apk ] && curl -LO https://dl.dropboxusercontent.com/s/5f288fvtk1qunfw/gcam_go.apk
-	cd ../..
-	
-
     echo "--> Applying PHH patches"
     cd device/phh/treble
     cp $PEMK .
@@ -101,9 +95,9 @@ generatePackages() {
 START=`date +%s`
 BUILD_DATE="$(date +%Y%m%d)"
 
-initRepos
-syncRepos
-applyPatches
+# initRepos
+# syncRepos
+# applyPatches
 setupEnv
 buildTrebleApp
 buildVariant

@@ -1,4 +1,4 @@
-From 93e76348664755fda75ec84a17e3a407835be8e5 Mon Sep 17 00:00:00 2001
+From 778c1b98e869d0a1a558ab6e6970c35faf888d8f Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Thu, 22 Jul 2021 11:35:11 +0100
 Subject: [PATCH 08/11] sepolicy: Add flipendo sepolicy

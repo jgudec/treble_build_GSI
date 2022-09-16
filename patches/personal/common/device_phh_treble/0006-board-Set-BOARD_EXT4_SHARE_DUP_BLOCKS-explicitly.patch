@@ -1,4 +1,4 @@
-From 690a02bb9b5a10ad35f68ac41061b9a16deb30d5 Mon Sep 17 00:00:00 2001
+From b1a511c1c919f7b286078efd7ee6a55506eb8135 Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Sun, 8 Aug 2021 09:29:32 +0000
 Subject: [PATCH 06/11] board: Set BOARD_EXT4_SHARE_DUP_BLOCKS explicitly

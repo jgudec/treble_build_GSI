@@ -1,0 +1,48 @@
+From 8308f283fd60cc7ea7b912a6f7c32f4275e312c0 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Mon, 5 Sep 2022 16:42:15 +0200
+Subject: [PATCH] SystemUI: styles: Change Keyguard style on light wallpapers
+
+Thfixes the horrendously dark lock screen clock color that DEFINITELY should not exist on a rom called Pixel Experience as it DEFINITELY doesn't look like that on Pixel devices.
+
+Change-Id: I9e1f06c7b8a7399c4e072f2a222c14e311db500c
+---
+ core/java/android/service/wallpaper/WallpaperService.java | 2 +-
+ packages/SystemUI/res/values/styles.xml                   | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/core/java/android/service/wallpaper/WallpaperService.java b/core/java/android/service/wallpaper/WallpaperService.java
+index b68717a9b457..57b55be3f2ef 100644
+--- a/core/java/android/service/wallpaper/WallpaperService.java
++++ b/core/java/android/service/wallpaper/WallpaperService.java
+@@ -272,7 +272,7 @@ public abstract class WallpaperService extends Service {
+         private Display mDisplay;
+         private Context mDisplayContext;
+         private int mDisplayState;
+-        private float mWallpaperDimAmount = 0.05f;
++        private float mWallpaperDimAmount = 0.45f;
+ 
+         SurfaceControl mSurfaceControl = new SurfaceControl();
+         SurfaceControl mBbqSurfaceControl;
+diff --git a/packages/SystemUI/res/values/styles.xml b/packages/SystemUI/res/values/styles.xml
+index f26159f5176a..648c2ff4e225 100644
+--- a/packages/SystemUI/res/values/styles.xml
++++ b/packages/SystemUI/res/values/styles.xml
+@@ -288,11 +288,11 @@
+     </style>
+ 
+     <style name="Theme.SystemUI.LightWallpaper">
+-        <item name="wallpaperTextColor">@*android:color/primary_text_material_light</item>
++        <!-- <item name="wallpaperTextColor">@*android:color/primary_text_material_light</item>
+         <item name="wallpaperTextColorSecondary">@*android:color/secondary_text_material_light</item>
+-        <item name="wallpaperTextColorAccent">@*android:color/system_accent2_600</item>
++        <item name="wallpaperTextColorAccent">@*android:color/system_accent2_100</item>
+         <item name="android:colorError">@*android:color/error_color_material_light</item>
+-        <item name="shadowRadius">0</item>
++        <item name="shadowRadius">0</item> -->
+ 
+         <!-- Needed for MediaRoute chooser dialog -->
+         <item name="*android:isLightTheme">true</item>
+-- 
+2.17.1
+

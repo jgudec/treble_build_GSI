@@ -1,19 +1,19 @@
-From 8256301ec710a286eb9114569511ca72307478f8 Mon Sep 17 00:00:00 2001
+From 6a3153cf154432bf060193432592aad05ee1f24d Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Fri, 12 Aug 2022 08:57:10 +0100
 Subject: [PATCH 11/11] Address some sepolicy denials
 
 ---
- sepolicy/unknown.te | 169 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 169 insertions(+)
+ sepolicy/unknown.te | 173 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 173 insertions(+)
  create mode 100644 sepolicy/unknown.te
 
 diff --git a/sepolicy/unknown.te b/sepolicy/unknown.te
 new file mode 100644
-index 0000000..74a0e34
+index 0000000..fc57102
 --- /dev/null
 +++ b/sepolicy/unknown.te
-@@ -0,0 +1,169 @@
+@@ -0,0 +1,173 @@
 +allow audioserver vendor_default_prop:file {read};
 +
 +allow priv_app gmscore_app:file {read open};
@@ -183,6 +183,11 @@ index 0000000..74a0e34
 +allow system_suspend sysfs_ss_writable:file {getattr};
 +
 +allow system_app qemu_hw_prop:file {map};
++
++allow hal_camera_default default_prop:file {map};
++
++allow hal_camera_default system_prop:file {map};
+\ No newline at end of file
 -- 
 2.17.1
 
