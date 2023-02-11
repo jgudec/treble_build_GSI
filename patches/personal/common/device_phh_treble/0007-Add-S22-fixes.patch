@@ -1,0 +1,233 @@
+From 166399c59e29a6d0698161e98bbbca906269934f Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sat, 11 Feb 2023 16:32:15 +0000
+Subject: [PATCH 1/3] Add S22 fixes
+
+---
+ base.mk                                       |   4 +
+ ...samsung_s22_audio_policy_configuration.xml | 132 ++++++++++++++++++
+ phh-prop-handler.sh                           |   6 +-
+ rw-system.sh                                  |  10 +-
+ system.prop                                   |  18 +++
+ 5 files changed, 165 insertions(+), 5 deletions(-)
+ create mode 100644 files/samsung_s22_audio_policy_configuration.xml
+
+diff --git a/base.mk b/base.mk
+index 2806744..b0e4776 100644
+--- a/base.mk
++++ b/base.mk
+@@ -245,3 +245,7 @@ include build/make/target/product/gsi_release.mk
+ # Protect deskclock from power save
+ PRODUCT_COPY_FILES += \
+ 	device/phh/treble/files/com.android.deskclock_whitelist.xml:system/etc/sysconfig/com.android.deskclock_whitelist.xml
++
++# Samsung Galaxy S22 fixes
++PRODUCT_COPY_FILES += \
++	device/phh/treble/files/samsung_s22_audio_policy_configuration.xml:system/etc/samsung_s22_audio_policy_configuration.xml
+diff --git a/files/samsung_s22_audio_policy_configuration.xml b/files/samsung_s22_audio_policy_configuration.xml
+new file mode 100644
+index 0000000..3a44360
+--- /dev/null
++++ b/files/samsung_s22_audio_policy_configuration.xml
+@@ -0,0 +1,132 @@
++<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
++
++<audioPolicyConfiguration version="1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
++
++    <globalConfiguration speaker_drc_enabled="true"/>
++
++    <modules>
++        <module name="primary" halVersion="3.0">
++            <attachedDevices>
++                <item>Earpiece</item>
++                <item>Speaker</item>
++                <item>Built-In Mic</item>
++                <item>Built-In Back Mic</item>
++                <item>Voice Call Mic</item>
++            </attachedDevices>
++
++            <defaultOutputDevice>Speaker</defaultOutputDevice>
++
++            <mixPorts>
++                <mixPort name="primary-out" role="source" flags="AUDIO_OUTPUT_FLAG_PRIMARY|AUDIO_OUTPUT_FLAG_DEEP_BUFFER">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </mixPort>
++                <mixPort name="fast" role="source" flags="AUDIO_OUTPUT_FLAG_FAST">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </mixPort>
++                <mixPort name="primary-in" role="sink">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK"/>
++                </mixPort>
++            </mixPorts>
++            <devicePorts>
++                <!-- Output devices declaration, i.e. Sink DEVICE PORT -->
++                <devicePort tagName="Earpiece" role="sink" type="AUDIO_DEVICE_OUT_EARPIECE">
++                   <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                            samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_MONO"/>
++                </devicePort>
++                <devicePort tagName="Speaker" role="sink" type="AUDIO_DEVICE_OUT_SPEAKER">
++                   <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                            samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </devicePort>
++                <devicePort tagName="Wired Headset" role="sink" type="AUDIO_DEVICE_OUT_WIRED_HEADSET">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                            samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </devicePort>
++                <devicePort tagName="Wired Headphone" role="sink" type="AUDIO_DEVICE_OUT_WIRED_HEADPHONE">
++                   <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                            samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </devicePort>
++                <devicePort tagName="Bt Sco All" role="sink" type="AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET">
++                   <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                            samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </devicePort>
++                <devicePort tagName="Aux Device Out" role="sink" type="AUDIO_DEVICE_OUT_AUX_DIGITAL">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="44100,48000,64000,88200,96000,128000,176400,192000"
++                             channelMasks="AUDIO_CHANNEL_OUT_MONO,AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_2POINT1,AUDIO_CHANNEL_OUT_QUAD,AUDIO_CHANNEL_OUT_PENTA,AUDIO_CHANNEL_OUT_5POINT1,AUDIO_CHANNEL_OUT_6POINT1,AUDIO_CHANNEL_OUT_7POINT1"/>
++                </devicePort>
++                <!-- Input devices declaration, i.e. source DEVICE PORT -->
++                <devicePort tagName="Built-In Mic" type="AUDIO_DEVICE_IN_BUILTIN_MIC" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK"/>
++                </devicePort>
++                <devicePort tagName="Built-In Back Mic" type="AUDIO_DEVICE_IN_BACK_MIC" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK"/>
++                </devicePort>
++                <devicePort tagName="Wired Headset Mic" type="AUDIO_DEVICE_IN_WIRED_HEADSET" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK"/>
++                </devicePort>
++                <devicePort tagName="Bt Sco Headset Mic" type="AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK"/>
++                </devicePort>
++                <devicePort tagName="Aux Device In" type="AUDIO_DEVICE_IN_AUX_DIGITAL" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK"/>
++                </devicePort>
++                <devicePort tagName="Voice Call Mic" type="AUDIO_DEVICE_IN_VOICE_CALL" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK"/>
++                </devicePort>
++                <devicePort tagName="FM Mic" type="AUDIO_DEVICE_IN_FM_TUNER" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK"/>
++                </devicePort>
++            </devicePorts>
++            <!-- route declaration, i.e. list all available sources for a given sink -->
++            <routes>
++                <route type="mix" sink="Earpiece"
++                       sources="primary-out,fast"/>
++                <route type="mix" sink="Speaker"
++                       sources="primary-out,fast"/>
++                <route type="mix" sink="Wired Headset"
++                       sources="primary-out,fast"/>
++                <route type="mix" sink="Wired Headphone"
++                       sources="primary-out,fast"/>
++                <route type="mix" sink="Bt Sco All"
++                       sources="primary-out,fast"/>
++                <route type="mix" sink="primary-in"
++                       sources="Built-In Mic, Wired Headset Mic,Bt Sco Headset Mic,Aux Device In,Voice Call Mic,FM Mic"/>
++            </routes>
++
++        </module>
++
++        <!-- A2dp Audio HAL -->
++        <xi:include href="a2dp_audio_policy_configuration.xml"/>
++
++        <!-- Remote Submix Audio HAL -->
++        <xi:include href="r_submix_audio_policy_configuration.xml"/>
++
++    </modules>
++    <!-- End of Modules section -->
++
++    <!-- Volume section -->
++
++    <xi:include href="audio_policy_volumes.xml"/>
++    <xi:include href="default_volume_tables.xml"/>
++
++    <!-- End of Volume section -->
++
++</audioPolicyConfiguration>
+\ No newline at end of file
+diff --git a/phh-prop-handler.sh b/phh-prop-handler.sh
+index 24056e4..280b831 100644
+--- a/phh-prop-handler.sh
++++ b/phh-prop-handler.sh
+@@ -139,10 +139,8 @@ if [ "$1" == "persist.sys.phh.caf.audio_policy" ];then
+         elif [ -f /vendor/etc/audio/sku_${sku}_qssi/audio_policy_configuration.xml ] && [ -f /vendor/etc/audio/sku_$sku/audio_policy_configuration.xml ];then
+             umount /vendor/etc/audio
+             mount /vendor/etc/audio/sku_${sku}_qssi/audio_policy_configuration.xml /vendor/etc/audio/sku_$sku/audio_policy_configuration.xml
+-        elif [ -f /vendor/etc/audio/audio_policy_configuration.xml ];then
+-            mount /vendor/etc/audio/audio_policy_configuration.xml /vendor/etc/audio_policy_configuration.xml
+-        elif [ -f /vendor/etc/audio_policy_configuration_base.xml ];then
+-            mount /vendor/etc/audio_policy_configuration_base.xml /vendor/etc/audio_policy_configuration.xml
++        elif [ -f /system/etc/samsung_s22_audio_policy_configuration.xml ];then
++            mount /system/etc/samsung_s22_audio_policy_configuration.xml /vendor/etc/audio_policy_configuration.xml
+         fi
+ 
+         if [ -f /vendor/lib/hw/audio.bluetooth_qti.default.so ];then
+diff --git a/rw-system.sh b/rw-system.sh
+index 4c7095a..66279f1 100644
+--- a/rw-system.sh
++++ b/rw-system.sh
+@@ -966,8 +966,16 @@ if getprop ro.vendor.build.fingerprint |grep -qiE '^samsung/';then
+     setprop persist.sys.phh.fod.samsung true
+ fi
+ 
+-if getprop ro.vendor.build.fingerprint | grep -q -e samsung/o1s -e samsung/t2s -e samsung/p3s; then
++if getprop ro.vendor.build.fingerprint | grep -q -e samsung/o1s -e samsung/t2s -e samsung/p3s -e samsung/r0s -e samsung/g0s -e samsung/b0s; then
+     setprop persist.sys.phh.ultrasonic_udfps true
++
++    echo 404000 > /sys/kernel/gpu/gpu_min_clock
++
++    resetprop_phh ro.surface_flinger.set_idle_timer_ms 1000
++
++    resetprop_phh ro.surface_flinger.set_touch_timer_ms 800
++
++    resetprop_phh ro.surface_flinger.set_display_power_timer_ms 4000
+ fi
+ 
+ if getprop ro.vendor.build.fingerprint |grep -qiE -e ASUS_I006D -e ASUS_I003;then
+diff --git a/system.prop b/system.prop
+index db7c86d..0815cae 100644
+--- a/system.prop
++++ b/system.prop
+@@ -33,3 +33,21 @@ bluetooth.profile.pan.nap.enabled?=true
+ bluetooth.profile.pan.panu.enabled?=true
+ bluetooth.profile.pbap.server.enabled?=true
+ bluetooth.profile.sap.server.enabled?=true
++
++# Enable corner padding by default
++persist.sys.phh.rounded_corners_padding=48
++
++# S22 props
++persist.sys.sf.hs_mode=0
++debug.sf.frame_rate_multiple_threshold=120
++ro.surface_flinger.use_content_detection_for_refresh_rate=true
++
++#visual_tweak
++debug.sf.hw=0
++debug.egl.hw=0
++debug.enable.sglscale=1
++debug.sf.enable_hwc_vds=1
++debug.gralloc.enable_fb_ubwc=1
++debug.sf.latch_unsignaled=1
++debug.sf.recomputecrop=0
++dev.pm.dyn_samplingrate=1
+-- 
+2.17.1
+

@@ -14,6 +14,13 @@ BL=$PWD/treble_build_pe
 BD=$HOME/builds
 BRANCH=$1
 
+export USE_CCACHE=1
+export CCACHE_COMPRESS=1
+export CCACHE_EXEC=/usr/bin/ccache
+export CCACHE_DIR=/mnt/ccache
+export CCACHE_EXEC=$(command -v ccache)
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
 [ "$BRANCH" == "plus" ] && BRANCH="thirteen-plus" || BRANCH="thirteen"
 [ "$BRANCH" == "thirteen-plus" ] && BUILD="PixelExperience_Plus" || BUILD="PixelExperience"
 [ "$BRANCH" == "thirteen-plus" ] && PEMK="$BL/peplus.mk" || PEMK="$BL/pe.mk"

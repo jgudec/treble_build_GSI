@@ -1,0 +1,193 @@
+From 51791947d0c93ae0926eeac694f4779e091de2e9 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sat, 11 Feb 2023 16:33:30 +0000
+Subject: [PATCH 2/3] Fix some sepolicy denials
+
+---
+ sepolicy/unknown.te | 173 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 173 insertions(+)
+ create mode 100644 sepolicy/unknown.te
+
+diff --git a/sepolicy/unknown.te b/sepolicy/unknown.te
+new file mode 100644
+index 0000000..fc57102
+--- /dev/null
++++ b/sepolicy/unknown.te
+@@ -0,0 +1,173 @@
++allow audioserver vendor_default_prop:file {read};
++
++allow priv_app gmscore_app:file {read open};
++
++allow priv_app gmscore_app:dir {search};
++
++allow priv_app gmscore_app:process {getattr};
++
++allow system_app shell_data_file:dir {search};
++
++allow system_server audioserver:process {getattr};
++
++allow system_server default_android_hwservice:hwservice_manager {find};
++
++allow system_server platform_app:process {getattr};
++
++allow system_server priv_app:process {getattr};
++
++allow system_server gmscore_app:process {getattr};
++
++allow system_server untrusted_app:process {getattr};
++
++allow system_server radio:process {getattr};
++
++allow system_server system_app:process {getattr};
++
++allow system_server bluetooth:process {getattr};
++
++allow system_server mediaprovider:process {getattr};
++
++allow system_server permissioncontroller_app:process {getattr};
++
++allow system_server network_stack:process {getattr};
++
++allow system_server nfc:process {getattr};
++
++allow system_server secure_element:process {getattr};
++
++allow system_server storaged:process {getattr};
++
++allow system_server mediaprovider_app:process {getattr};
++
++allow surfaceflinger system_app:process {getattr};
++
++allow surfaceflinger platform_app:process {getattr};
++
++allow surfaceflinger system_server:process {getattr};
++
++allow surfaceflinger untrusted_app:process {getattr};
++
++allow surfaceflinger priv_app:process {getattr};
++
++allow vold system_server:process {getattr};
++
++type sysfs_battery, sysfs_type, fs_type;
++
++allow system_suspend sysfs_battery:dir {read};
++
++type sysfs_ss_writable, sysfs_type, fs_type;
++
++allow system_suspend sysfs_ss_writable:dir {read open};
++
++allow system_server cameraserver:process {getattr};
++
++type hal_camera_default, domain;
++
++allow hal_camera_default default_prop:file {read};
++
++allow system_suspend sysfs_battery:dir {open};
++
++allow system_server surfaceflinger:process {getattr};
++
++allow surfaceflinger permissioncontroller_app:process {getattr};
++
++allow rild system_prop:file {getattr read};
++
++allow system_server mediametrics:process {getattr};
++
++allow installd installd:capability {sys_ptrace};
++
++allow system_app vendor_persist_camera_prop:property_service {set};
++
++allow system_app qemu_hw_prop:file {read};
++
++type hal_memtrack_default, domain;
++
++allow system_app hal_memtrack_default:binder {call};
++
++allow system_app storaged:binder {call};
++
++type hal_mpp_default, domain;
++
++allow system_app hal_mpp_default:binder {call};
++
++allow crash_dump gpu_device:dir {search};
++
++allow system_app default_android_hwservice:hwservice_manager {find};
++
++allow hal_fingerprint_oppo_compat default_android_hwservice:hwservice_manager {find};
++
++allow system_app system_suspend_control_service:service_manager {find};
++
++set_prop(shell, surfaceflinger_prop)
++
++set_prop(system_app, surfaceflinger_prop)
++
++allow system_server keystore:process {getattr};
++
++allow system_app qemu_hw_prop:file {open};
++
++allow rild system_prop:file {open};
++
++allow installd system_server:file {open};
++
++allow system_suspend sysfs_battery:file {open getattr read};
++
++allow shell kernel:system {syslog_read};
++
++type magisk, domain;
++
++allow system_server magisk:process {getattr};
++
++allow system_server system_suspend:process {getattr};
++
++allow installd system_server:file {read};
++
++allow hal_camera_default default_prop:file {open};
++
++allow hal_camera_default system_prop:file {read};
++
++allow system_server isolated_app:process {getattr};
++
++type gpsd, domain;
++
++allow gpsd radio_prop:file {read};
++
++type hal_audio_default, domain;
++
++allow hal_audio_default system_suspend_hwservice:hwservice_manager {find};
++
++allow system_suspend sysfs_ss_writable:file {read};
++
++allow rild system_prop:file {map};
++
++allow system_app qemu_hw_prop:file {getattr};
++
++allow system_app system_suspend:binder {call};
++
++allow system_app system_suspend_control_internal_service:service_manager {find};
++
++allow system_app tracingproxy_service:service_manager {find};
++
++type hal_hdcp_default, domain;
++
++allow system_app hal_hdcp_default:binder {call};
++
++allow hal_camera_default system_prop:file {open getattr};
++
++allow system_suspend sysfs_ss_writable:file {open};
++
++type mediacodec, domain;
++
++allow mediacodec default_prop:file {read};
++
++allow hal_camera_default default_prop:file {getattr};
++
++allow system_suspend sysfs_ss_writable:file {getattr};
++
++allow system_app qemu_hw_prop:file {map};
++
++allow hal_camera_default default_prop:file {map};
++
++allow hal_camera_default system_prop:file {map};
+\ No newline at end of file
+-- 
+2.17.1
+

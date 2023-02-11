@@ -1,0 +1,111 @@
+From 28f52ed908b5ed7417105e7038f534989f7b3483 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sat, 11 Feb 2023 18:41:02 +0000
+Subject: [PATCH 1/2] Add options for min/max refresh rate
+
+Tailored to the Samsung Galaxy S22 refresh rate capabilities
+---
+ app/src/main/java/me/phh/treble/app/Misc.kt   | 13 ++++++++++++
+ .../java/me/phh/treble/app/MiscSettings.kt    |  2 ++
+ app/src/main/res/values/arrays.xml            | 21 +++++++++++++++++++
+ app/src/main/res/xml/pref_misc.xml            | 12 +++++++++++
+ 4 files changed, 48 insertions(+)
+ create mode 100644 app/src/main/res/values/arrays.xml
+
+diff --git a/app/src/main/java/me/phh/treble/app/Misc.kt b/app/src/main/java/me/phh/treble/app/Misc.kt
+index 92e7eb9..289d759 100644
+--- a/app/src/main/java/me/phh/treble/app/Misc.kt
++++ b/app/src/main/java/me/phh/treble/app/Misc.kt
+@@ -261,6 +261,17 @@ object Misc: EntryStartup {
+                 val value = sp.getString(key, "00ff00")
+                 SystemProperties.set("persist.sys.phh.fod_color", value)
+             }
++
++            MiscSettings.minHz -> {
++                val value = sp.getString(key, "-1").toInt()
++                    Settings.System.putInt(c.contentResolver,
++                        "MIN_REFRESH_RATE".toLowerCase(), value);
++            }
++            MiscSettings.maxHz -> {
++                val value = sp.getString(key, "-1").toInt()
++                    Settings.System.putInt(c.contentResolver,
++                        "PEAK_REFRESH_RATE".toLowerCase(), value);
++            }
+         }
+     }
+ 
+@@ -288,5 +299,7 @@ object Misc: EntryStartup {
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.noHwcomposer)
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.storageFUSE)
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.dt2w)
++        spListener.onSharedPreferenceChanged(sp, MiscSettings.minHz)
++        spListener.onSharedPreferenceChanged(sp, MiscSettings.maxHz)
+     }
+ }
+diff --git a/app/src/main/java/me/phh/treble/app/MiscSettings.kt b/app/src/main/java/me/phh/treble/app/MiscSettings.kt
+index dc8cce4..9493284 100644
+--- a/app/src/main/java/me/phh/treble/app/MiscSettings.kt
++++ b/app/src/main/java/me/phh/treble/app/MiscSettings.kt
+@@ -39,6 +39,8 @@ object MiscSettings : Settings {
+     val dt2w = "key_misc_dt2w"
+     val restartSystemUI = "key_misc_restart_systemui"
+     val fodColor = "key_misc_fod_color"
++    val minHz = "key_misc_min_hz"
++    val maxHz = "key_misc_max_hz"
+ 
+     override fun enabled() = true
+ }
+diff --git a/app/src/main/res/values/arrays.xml b/app/src/main/res/values/arrays.xml
+new file mode 100644
+index 0000000..dd24c1d
+--- /dev/null
++++ b/app/src/main/res/values/arrays.xml
+@@ -0,0 +1,21 @@
++<?xml version="1.0" encoding="utf-8"?>
++
++<!-- All lists for ListPreference keys/values are placed here -->
++<resources>
++    <array name="pref_misc_display_refresh_rate">
++        <item>"10 Hz"</item>
++        <item>"24 Hz"</item>
++        <item>"48 Hz"</item>
++        <item>"60 Hz"</item>
++        <item>"96 Hz"</item>
++        <item>"120 Hz"</item>
++    </array>
++    <array name="pref_misc_refresh_rate_values">
++        <item>"10"</item>
++        <item>"24"</item>
++        <item>"48"</item>
++        <item>"60"</item>
++        <item>"96"</item>
++        <item>"120"</item>
++    </array>
++</resources>
+\ No newline at end of file
+diff --git a/app/src/main/res/xml/pref_misc.xml b/app/src/main/res/xml/pref_misc.xml
+index 9ff572f..53ba869 100644
+--- a/app/src/main/res/xml/pref_misc.xml
++++ b/app/src/main/res/xml/pref_misc.xml
+@@ -53,6 +53,18 @@
+ 			android:entryValues="@array/pref_misc_display_fps_values"
+ 			android:key="key_misc_display_fps"
+ 			android:title="Force FPS" />
++			<ListPreference
++			android:defaultValue="10"
++			android:entries="@array/pref_misc_display_refresh_rate"
++			android:entryValues="@array/pref_misc_refresh_rate_values"
++			android:key="key_misc_min_hz"
++			android:title="Minimum refresh rate" />
++		<ListPreference
++			android:defaultValue="120"
++			android:entries="@array/pref_misc_display_refresh_rate"
++			android:entryValues="@array/pref_misc_refresh_rate_values"
++			android:key="key_misc_max_hz"
++			android:title="Maximum refresh rate" />
+         <Preference
+             android:key="key_misc_restart_systemui"
+             android:title="Restart SystemUI"
+-- 
+2.17.1
+
