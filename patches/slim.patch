@@ -1,21 +1,45 @@
-From b77f42eacac1f9dafb90498fab93e075193d1ff4 Mon Sep 17 00:00:00 2001
+From 73e69ceb324f5f096400420cf088408d247496ab Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
-Date: Tue, 27 Sep 2022 12:14:29 +0000
+Date: Wed, 15 Feb 2023 09:52:57 +0000
 Subject: [PATCH] Slim Pixel Experience 13
 
 ---
- config.mk                                     | 21 -------------------
- .../privileged_apps/TurboAdapter/Android.mk   |  2 ++
- 2 files changed, 2 insertions(+), 21 deletions(-)
+ common/common-vendor.mk |  4 ----
+ extras/config.mk        | 12 ------------
+ 2 files changed, 16 deletions(-)
 
-diff --git a/config.mk b/config.mk
-index c4a3802..760ba56 100644
---- a/config.mk
-+++ b/config.mk
-@@ -16,25 +16,12 @@
- #
- #
- 
+diff --git a/common/common-vendor.mk b/common/common-vendor.mk
+index 328ea71..4f068a4 100644
+--- a/common/common-vendor.mk
++++ b/common/common-vendor.mk
+@@ -41,14 +41,11 @@ PRODUCT_PACKAGES += \
+     CalendarGooglePrebuilt \
+     Chrome-Stub \
+     GoogleContacts \
+-    GoogleTTS \
+     LatinIMEGooglePrebuilt \
+     LocationHistoryPrebuilt \
+     MarkupGoogle \
+-    Photos \
+     PixelThemesStub \
+     PrebuiltDeskClockGoogle \
+-    SoundAmplifierPrebuilt \
+     SoundPickerPrebuilt \
+     TrichromeLibrary-Stub \
+     WebViewGoogle-Stub \
+@@ -72,7 +69,6 @@ PRODUCT_PACKAGES += \
+     SettingsIntelligenceGooglePrebuilt \
+     SetupWizardPrebuilt \
+     TurboPrebuilt \
+-    Velvet \
+     WellbeingPrebuilt \
+     EmergencyInfoGoogleNoUi \
+     Flipendo \
+diff --git a/extras/config.mk b/extras/config.mk
+index ec046a7..bd77c23 100644
+--- a/extras/config.mk
++++ b/extras/config.mk
+@@ -1,21 +1,9 @@
 -# Recorder
 -ifeq ($(TARGET_SUPPORTS_GOOGLE_RECORDER), true)
 -PRODUCT_PACKAGES += \
@@ -31,45 +55,12 @@ index c4a3802..760ba56 100644
 -# Live Wallpapers
 -ifeq ($(TARGET_INCLUDE_LIVE_WALLPAPERS),true)
 -PRODUCT_PACKAGES += \
--    PixelLiveWallpaperPrebuilt \
--    MicropaperPrebuilt
+-    PixelLiveWallpaperPrebuilt
 -endif
 -
  # Quick Tap
  ifeq ($(TARGET_SUPPORTS_QUICK_TAP),true)
  PRODUCT_PACKAGES += \
-@@ -56,23 +43,16 @@ PRODUCT_PACKAGES += \
-     Chrome-Stub \
-     DevicePolicyPrebuilt \
-     DiagnosticsToolPrebuilt \
--    Drive \
-     GoogleContacts \
--    GoogleTTS \
-     LatinIMEGooglePrebuilt \
-     LocationHistoryPrebuilt \
--    Maps \
-     MarkupGoogle \
--    Photos \
-     PixelThemesStub \
-     PixelThemesStub2022_and_newer \
--    PixelWallpapers2022 \
-     PrebuiltBugle \
-     PrebuiltDeskClockGoogle \
--    PrebuiltGmail \
-     PrebuiltGoogleAdservicesTvp \
-     PrebuiltGoogleTelemetryTvp \
--    SoundAmplifierPrebuilt \
-     SoundPickerPrebuilt \
-     TrichromeLibrary \
-     TrichromeLibrary-Stub \
-@@ -123,7 +103,6 @@ PRODUCT_PACKAGES += \
-     Showcase \
-     TetheringEntitlement \
-     TurboPrebuilt \
--    Velvet \
-     VzwOmaTrigger \
-     WallpaperEffect \
-     WellbeingPrebuilt \
 -- 
-2.32.0
+2.34.1
 
