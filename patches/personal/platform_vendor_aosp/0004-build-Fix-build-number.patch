@@ -1,7 +1,7 @@
 From df6e77eabe8083191e2984182d8aa82da7d08247 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Sat, 3 Oct 2020 14:28:35 -0700
-Subject: [PATCH] build: Fix build number
+Subject: [PATCH 4/4] build: Fix build number
 
 This is only valid for GSI images.
 
@@ -18,9 +18,10 @@ index 5f93620c..2716de28 100644
  
  CUSTOM_PLATFORM_VERSION := 13.0
  
--CUSTOM_VERSION := PixelExperience_Plus_$(CUSTOM_BUILD)-$(CUSTOM_PLATFORM_VERSION)-$(CUSTOM_BUILD_DATE)-$(CUSTOM_BUILD_TYPE)
-+CUSTOM_VERSION := PixelExperience_Plus_$(TARGET_PRODUCT)-$(CUSTOM_PLATFORM_VERSION)-$(CUSTOM_BUILD_DATE)-$(CUSTOM_BUILD_TYPE)
- CUSTOM_VERSION_PROP := thirteen_plus
+-CUSTOM_VERSION := PixelExperience_$(CUSTOM_BUILD)-$(CUSTOM_PLATFORM_VERSION)-$(CUSTOM_BUILD_DATE)-$(CUSTOM_BUILD_TYPE)
++CUSTOM_VERSION := PixelExperience_$(TARGET_PRODUCT)-$(CUSTOM_PLATFORM_VERSION)-$(CUSTOM_BUILD_DATE)-$(CUSTOM_BUILD_TYPE)
+ CUSTOM_VERSION_PROP := thirteen
+\ No newline at end of file
 -- 
 2.25.1
 

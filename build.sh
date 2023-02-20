@@ -28,7 +28,7 @@ export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 initRepos() {
     if [ ! -d .repo ]; then
         echo "--> Initializing workspace"
-        repo init -u https://github.com/PixelExperience/manifest -b $BRANCH
+        repo init -u https://github.com/PixelExperience/manifest -b thirteen
         echo
 
         echo "--> Preparing local manifest"
@@ -51,14 +51,14 @@ applyPatches() {
 
     echo "--> Applying TrebleDroid patches"
     cd device/phh/treble
-    cp $PEMK .
-    bash generate.sh $(echo $PEMK | sed "s#$BL/##;s#.mk##")
+    cp $BL/pe.mk .
+    bash generate.sh pe
     cd ../../..
-    bash $BL/apply-patches.sh $BL trebledroid $BRANCH
+    bash $BL/apply-patches.sh $BL trebledroid
     echo
 
     echo "--> Applying personal patches"
-    bash $BL/apply-patches.sh $BL personal $BRANCH
+    bash $BL/apply-patches.sh $BL personal
     echo
 }
 
@@ -89,9 +89,9 @@ buildVariant() {
 
 buildSlimVariant() {
     echo "--> Building treble_arm64_bvN-slim"
-    (cd vendor/gapps && git am $BL/patches/slim.patch)
+    (cd vendor/gms && git am $BL/patches/slim.patch)
     make -j$(nproc --all) systemimage
-    (cd vendor/gapps && git reset --hard HEAD~1)
+    (cd vendor/gms && git reset --hard HEAD~1)
     mv $OUT/system.img $BD/system-treble_arm64_bvN-slim.img
     echo
 }
@@ -108,9 +108,9 @@ buildVndkliteVariant() {
 
 generatePackages() {
     echo "--> Generating packages"
-    xz -cv $BD/system-treble_arm64_bvN.img -T0 > $BD/"$BUILD"_arm64-ab-13.0-$BUILD_DATE-UNOFFICIAL.img.xz
-    xz -cv $BD/system-treble_arm64_bvN-vndklite.img -T0 > $BD/"$BUILD"_arm64-ab-vndklite-13.0-$BUILD_DATE-UNOFFICIAL.img.xz
-    xz -cv $BD/system-treble_arm64_bvN-slim.img -T0 > $BD/"$BUILD"_arm64-ab-slim-13.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    xz -cv $BD/system-treble_arm64_bvN.img -T0 > $BD/PixelExperience_arm64-ab-13.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    xz -cv $BD/system-treble_arm64_bvN-vndklite.img -T0 > $BD/PixelExperience_arm64-ab-vndklite-13.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    xz -cv $BD/system-treble_arm64_bvN-slim.img -T0 > $BD/PixelExperience_arm64-ab-slim-13.0-$BUILD_DATE-UNOFFICIAL.img.xz
     rm -rf $BD/system-*.img
     echo
 }
