@@ -5,7 +5,7 @@ Set up your environment by referring to [LineageOS Wiki](https://wiki.lineageos.
 
 Create a new working directory for your LineageOS build and navigate to it:
 
-    mkdir lineage-20-build-gsi; cd lineage-20-build-gsi
+    mkdir los; cd los
 
 Initialize your LineageOS workspace:
 
@@ -13,12 +13,12 @@ Initialize your LineageOS workspace:
 
 Clone both this and the patches repos:
 
-    git clone https://github.com/AndyCGYan/lineage_build_unified lineage_build_unified -b lineage-20-light
-    git clone https://github.com/AndyCGYan/lineage_patches_unified lineage_patches_unified -b lineage-20-light
+    git clone https://github.com/jgudec/treble_build_s22 lineage_build_unified -b los-20-light
+    git clone https://github.com/jgudec/lineage_patches_unified lineage_patches_unified -b los-20-light
 
 Finally, start the build script - for example, to build for all supported archs:
 
-    bash lineage_build_unified/buildbot_unified.sh treble 64VN 64VS 64GN
+    bash lineage_build_unified/buildbot_unified.sh treble 64GN
 
 Be sure to update the cloned repos from time to time!
 
