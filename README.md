@@ -12,7 +12,7 @@ To get started with building Pixel Experience GSI, you'll need to get familiar w
     ```
 - Finally, start the build script:
     ```
-    bash treble_build_pe/build.sh [thirteen|thirteen-plus]
+    bash treble_build_s22/build.sh [thirteen|thirteen-plus]
     ```
 
 ## Credits
