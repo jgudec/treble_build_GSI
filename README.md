@@ -8,7 +8,7 @@ To get started with building Pixel Experience GSI, you'll need to get familiar w
     ```
 - Clone this repo:
     ```
-    git clone https://github.com/ponces/treble_build_pe -b thirteen
+    git clone https://github.com/jgudec/treble_build_s22 -b pe-13
     ```
 - Finally, start the build script:
     ```
