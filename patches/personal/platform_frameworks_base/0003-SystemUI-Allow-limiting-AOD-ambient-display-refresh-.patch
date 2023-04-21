@@ -1,32 +1,41 @@
-From 088b4c9f47afd73b767349aca927519c2ffa3e0e Mon Sep 17 00:00:00 2001
-From: John Galt <johngaltfirstrun@gmail.com>
-Date: Sat, 11 Feb 2023 18:55:05 +0000
-Subject: [PATCH] SystemUI: Allow limiting AOD & ambient display refresh rate
- via overlay
+From 819e9c6e3abb82e9e7157c4988a000b3fa565b64 Mon Sep 17 00:00:00 2001
+From: Ido Ben-Hur <idoybh2@gmail.com>
+Date: Sat, 16 Jul 2022 03:54:52 +0300
+Subject: [PATCH 1/2] SystemUI: Allow limiting AOD & ambient display refresh
+ rate
 
-Change-Id: Ifb7d1fa2349848a158f403a0914a558575980b7b
+via overlay. This should save some juice while showing it.
+AOSP has implementation for keyguard & AOD but lack AOD only -
+We still want to show keyguard at max rate to allow better UX
+
+This feature should behave fine with config_keyguardMaxRefreshRate and/or config_keyguardPrefferedRefreshRate set
+and thus allows setting a different rate for each
+
+Suggested-by: John Galt <johngaltfirstrun@gmail.com>
+Change-Id: Ie59a86d000301c9fb97fb9332d869ef3b81d7efd
 ---
  packages/SystemUI/res/values/config.xml       |  3 +++
  ...NotificationShadeWindowControllerImpl.java | 22 +++++++++++++++++++
  2 files changed, 25 insertions(+)
 
 diff --git a/packages/SystemUI/res/values/config.xml b/packages/SystemUI/res/values/config.xml
-index 6b1942aba172..fcbfae2fd43a 100644
+index 38a829923ecf..3cad7a8ccfe6 100644
 --- a/packages/SystemUI/res/values/config.xml
 +++ b/packages/SystemUI/res/values/config.xml
-@@ -774,4 +774,7 @@
-         <item>@color/dream_overlay_aqi_very_unhealthy</item>
-         <item>@color/dream_overlay_aqi_hazardous</item>
-     </integer-array>
-+
-+    <!-- Preferred max refresh rate at AOD & Ambient Display, if supported by the display. -->
+@@ -808,5 +808,8 @@
+         <item>bottom_start:home</item>
+         <item>bottom_end:wallet</item>
+     </string-array>
++	
++	<!-- Preferred max refresh rate at AOD & Ambient Display, if supported by the display. -->
 +    <integer name="config_aodMaxRefreshRate">-1</integer>
+ 
  </resources>
 diff --git a/packages/SystemUI/src/com/android/systemui/shade/NotificationShadeWindowControllerImpl.java b/packages/SystemUI/src/com/android/systemui/shade/NotificationShadeWindowControllerImpl.java
-index 1d9210592b78..c70322683e5d 100644
+index 8314ec713ccb..b3a22924422e 100644
 --- a/packages/SystemUI/src/com/android/systemui/shade/NotificationShadeWindowControllerImpl.java
 +++ b/packages/SystemUI/src/com/android/systemui/shade/NotificationShadeWindowControllerImpl.java
-@@ -99,6 +99,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+@@ -100,6 +100,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
      private final long mLockScreenDisplayTimeout;
      private final float mKeyguardPreferredRefreshRate; // takes precedence over max
      private final float mKeyguardMaxRefreshRate;
@@ -34,7 +43,7 @@ index 1d9210592b78..c70322683e5d 100644
      private final KeyguardViewMediator mKeyguardViewMediator;
      private final KeyguardBypassController mKeyguardBypassController;
      private final AuthController mAuthController;
-@@ -176,6 +177,11 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+@@ -182,6 +183,11 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
          // know that we're not falsing (because we unlocked.)
          mKeyguardMaxRefreshRate = context.getResources()
                  .getInteger(R.integer.config_keyguardMaxRefreshRate);
@@ -42,19 +51,19 @@ index 1d9210592b78..c70322683e5d 100644
 +        // Same as described above but limited to AOD
 +        // Allows using a different rate for each
 +        mAODMaxRefreshRate = context.getResources()
-+                .getInteger(R.integer.config_aodMaxRefreshRate);        
++                .getInteger(R.integer.config_aodMaxRefreshRate);
      }
  
      /**
-@@ -286,6 +292,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+@@ -299,6 +305,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
      private void applyKeyguardFlags(State state) {
          final boolean keyguardOrAod = state.mKeyguardShowing
                  || (state.mDozing && mDozeParameters.getAlwaysOn());
-+                boolean wasKeyguardRateSet = false;
++        boolean wasKeyguardRateSet = false;
          if ((keyguardOrAod && !state.mBackdropShowing && !state.mLightRevealScrimOpaque)
                  || mKeyguardViewMediator.isAnimatingBetweenKeyguardAndSurfaceBehind()) {
              // Show the wallpaper if we're on keyguard/AOD and the wallpaper is not occluded by a
-@@ -309,6 +316,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+@@ -322,6 +329,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
              if (onKeyguard
                      && mAuthController.isUdfpsEnrolled(KeyguardUpdateMonitor.getCurrentUser())) {
                  mLpChanged.preferredMaxDisplayRefreshRate = mKeyguardPreferredRefreshRate;
@@ -62,7 +71,7 @@ index 1d9210592b78..c70322683e5d 100644
              } else {
                  mLpChanged.preferredMaxDisplayRefreshRate = 0;
              }
-@@ -320,6 +328,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+@@ -333,6 +341,7 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
                      && !state.mKeyguardFadingAway && !state.mKeyguardGoingAway;
              if (state.mDozing || bypassOnKeyguard) {
                  mLpChanged.preferredMaxDisplayRefreshRate = mKeyguardMaxRefreshRate;
@@ -70,7 +79,7 @@ index 1d9210592b78..c70322683e5d 100644
              } else {
                  mLpChanged.preferredMaxDisplayRefreshRate = 0;
              }
-@@ -327,6 +336,19 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
+@@ -340,6 +349,19 @@ public class NotificationShadeWindowControllerImpl implements NotificationShadeW
                      (long) mLpChanged.preferredMaxDisplayRefreshRate);
          }
  

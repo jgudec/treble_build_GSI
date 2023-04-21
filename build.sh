@@ -10,7 +10,7 @@ echo
 
 set -e
 
-BL=$PWD/treble_build_pe
+BL=$PWD/treble_build_s22
 BD=$HOME/builds
 BRANCH=$1
 

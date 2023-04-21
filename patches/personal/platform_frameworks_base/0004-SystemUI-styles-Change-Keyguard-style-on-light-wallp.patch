@@ -1,21 +1,22 @@
-From 57ef0fdbd8f65eeed69c1c0ee5ef4a904aea2824 Mon Sep 17 00:00:00 2001
+From e65f1cb0f385c7ae743f8c51a24c2e8c7cda9959 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sat, 11 Feb 2023 19:10:30 +0000
-Subject: [PATCH] SystemUI: styles: Change Keyguard style on light wallpapers
+Date: Fri, 21 Apr 2023 16:49:15 +0100
+Subject: [PATCH 2/2] SystemUI: styles: Change Keyguard style on light
+ wallpapers
 
 This fixes the horrendously dark lock screen clock color that DEFINITELY should not exist on a rom called Pixel Experience as it DEFINITELY doesn't look like that on Pixel devices.
 
-Change-Id: Ib0a6286bcefab7f0bebac6d12aa8bb4375c730fa
+Change-Id: I330143ec335661967df1cc3129b04791891a192f
 ---
  core/java/android/service/wallpaper/WallpaperService.java | 2 +-
  packages/SystemUI/res/values/styles.xml                   | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/core/java/android/service/wallpaper/WallpaperService.java b/core/java/android/service/wallpaper/WallpaperService.java
-index 01749c0bebb9..d7d19d8816e2 100644
+index 2d1a41e92a99..017aa5fd6769 100644
 --- a/core/java/android/service/wallpaper/WallpaperService.java
 +++ b/core/java/android/service/wallpaper/WallpaperService.java
-@@ -284,7 +284,7 @@ public abstract class WallpaperService extends Service {
+@@ -285,7 +285,7 @@ public abstract class WallpaperService extends Service {
          private Context mDisplayContext;
          private int mDisplayState;
          private @Surface.Rotation int mDisplayInstallOrientation;
@@ -25,10 +26,10 @@ index 01749c0bebb9..d7d19d8816e2 100644
          private float mDefaultDimAmount = mWallpaperDimAmount;
  
 diff --git a/packages/SystemUI/res/values/styles.xml b/packages/SystemUI/res/values/styles.xml
-index ac3eb7e18539..9ffbb6ac6fdc 100644
+index b11b6d633f14..e726722566a4 100644
 --- a/packages/SystemUI/res/values/styles.xml
 +++ b/packages/SystemUI/res/values/styles.xml
-@@ -290,11 +290,11 @@
+@@ -321,11 +321,11 @@
      </style>
  
      <style name="Theme.SystemUI.LightWallpaper">
