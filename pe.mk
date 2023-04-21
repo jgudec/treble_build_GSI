@@ -13,5 +13,3 @@ TARGET_HAS_FUSEBLK_SEPOLICY_ON_VENDOR := true
 
 TARGET_DISABLE_BLUETOOTH_LE_READ_BUFFER_SIZE_V2 := true
 
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-    ro.system.ota.json_url=https://raw.githubusercontent.com/ponces/treble_build_pe/thirteen/ota.json
