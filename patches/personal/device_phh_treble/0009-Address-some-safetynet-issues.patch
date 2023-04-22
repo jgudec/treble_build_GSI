@@ -1,4 +1,4 @@
-From 2a51d9e0f3fed8b9264b536a11415d95da2855f6 Mon Sep 17 00:00:00 2001
+From cf9fb1e396161cee2d570c0cfad901570b7fbab1 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Sat, 11 Feb 2023 16:34:37 +0000
 Subject: [PATCH 3/3] Address some safetynet issues
@@ -8,7 +8,7 @@ Subject: [PATCH 3/3] Address some safetynet issues
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/base.mk b/base.mk
-index b0e4776..79e9ca6 100644
+index 82dcbf7..ed5655f 100644
 --- a/base.mk
 +++ b/base.mk
 @@ -71,7 +71,7 @@ PRODUCT_COPY_FILES += \
