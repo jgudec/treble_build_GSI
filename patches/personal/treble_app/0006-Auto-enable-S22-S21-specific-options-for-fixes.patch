@@ -1,19 +1,19 @@
-From 1f40d5469ed0c5694aa5b6de7c31b35f8de933f9 Mon Sep 17 00:00:00 2001
+From b7931f0b330adc68d3a259a231486574453fa9bc Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Sat, 11 Feb 2023 18:45:05 +0000
 Subject: [PATCH 2/2] Auto-enable S22/S21 specific options for fixes
 
 ---
- app/src/main/java/me/phh/treble/app/Misc.kt   | 21 +++++++++++++++++++
- .../main/java/me/phh/treble/app/Samsung.kt    | 19 +++++++++++++++++
+ app/src/main/java/me/phh/treble/app/Misc.kt   | 24 +++++++++++++++++++
+ .../main/java/me/phh/treble/app/Samsung.kt    | 19 +++++++++++++++
  app/src/main/res/xml/pref_misc.xml            |  4 ++--
- 3 files changed, 42 insertions(+), 2 deletions(-)
+ 3 files changed, 45 insertions(+), 2 deletions(-)
 
 diff --git a/app/src/main/java/me/phh/treble/app/Misc.kt b/app/src/main/java/me/phh/treble/app/Misc.kt
-index 289d759..da5a1ed 100644
+index 289d759..e4c8b10 100644
 --- a/app/src/main/java/me/phh/treble/app/Misc.kt
 +++ b/app/src/main/java/me/phh/treble/app/Misc.kt
-@@ -301,5 +301,26 @@ object Misc: EntryStartup {
+@@ -301,5 +301,29 @@ object Misc: EntryStartup {
          spListener.onSharedPreferenceChanged(sp, MiscSettings.dt2w)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.minHz)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.maxHz)
@@ -36,6 +36,9 @@ index 289d759..da5a1ed 100644
 +            }
 +            if(sp.getString(MiscSettings.roundedCorners,"-1") == "-1"){
 +                sp.edit().putString(MiscSettings.roundedCorners , "48").apply()
++            }
++            if(!sp.getBoolean(MiscSettings.sysbta,false)){
++                sp.edit().putBoolean(MiscSettings.sysbta , true).apply()
 +            }
 +        }
      }

@@ -1,4 +1,4 @@
-From 28f52ed908b5ed7417105e7038f534989f7b3483 Mon Sep 17 00:00:00 2001
+From d0576e99e9daee7cd8c6b724c74aae92cbb4bba3 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Sat, 11 Feb 2023 18:41:02 +0000
 Subject: [PATCH 1/2] Add options for min/max refresh rate
@@ -57,7 +57,7 @@ index dc8cce4..9493284 100644
  }
 diff --git a/app/src/main/res/values/arrays.xml b/app/src/main/res/values/arrays.xml
 new file mode 100644
-index 0000000..dd24c1d
+index 0000000..dcfaadd
 --- /dev/null
 +++ b/app/src/main/res/values/arrays.xml
 @@ -0,0 +1,21 @@
