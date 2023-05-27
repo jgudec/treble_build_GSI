@@ -1,0 +1,64 @@
+From 8a9c273feb787b1399b1f1f62cca1f94f41acd47 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sat, 27 May 2023 11:21:15 +0100
+Subject: [PATCH 1/3] Add some S22 fixes
+
+---
+ rw-system.sh | 10 +++++++++-
+ system.prop  | 21 +++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 1 deletion(-)
+
+diff --git a/rw-system.sh b/rw-system.sh
+index be432a3..d3410cb 100644
+--- a/rw-system.sh
++++ b/rw-system.sh
+@@ -966,8 +966,16 @@ if getprop ro.vendor.build.fingerprint |grep -qiE '^samsung/';then
+     setprop persist.sys.phh.fod.samsung true
+ fi
+ 
+-if getprop ro.vendor.build.fingerprint | grep -q -e samsung/o1s -e samsung/t2s -e samsung/p3s; then
++if getprop ro.vendor.build.fingerprint | grep -q -e samsung/o1s -e samsung/t2s -e samsung/p3s -e samsung/r0s -e samsung/g0s -e samsung/b0s; then
+     setprop persist.sys.phh.ultrasonic_udfps true
++	
++	echo 404000 > /sys/kernel/gpu/gpu_min_clock
++
++    resetprop_phh ro.surface_flinger.set_idle_timer_ms 1000
++
++    resetprop_phh ro.surface_flinger.set_touch_timer_ms 800
++
++    resetprop_phh ro.surface_flinger.set_display_power_timer_ms 4000
+ fi
+ 
+ if getprop ro.vendor.build.fingerprint |grep -qiE -e ASUS_I006D -e ASUS_I003;then
+diff --git a/system.prop b/system.prop
+index 6270c41..117217c 100644
+--- a/system.prop
++++ b/system.prop
+@@ -52,3 +52,24 @@ vendor.usb.use_ffs_mtp=1
+ 
+ # Wireless Display
+ persist.debug.wfd.enable=1
++
++# Enable corner padding by default
++persist.sys.phh.rounded_corners_padding=48
++
++# S22 props
++persist.sys.sf.hs_mode=0
++debug.sf.frame_rate_multiple_threshold=120
++ro.surface_flinger.use_content_detection_for_refresh_rate=true
++
++#visual_tweak
++debug.sf.hw=0
++debug.egl.hw=0
++debug.enable.sglscale=1
++debug.sf.enable_hwc_vds=1
++debug.gralloc.enable_fb_ubwc=1
++debug.sf.latch_unsignaled=1
++debug.sf.recomputecrop=0
++dev.pm.dyn_samplingrate=1
++
++# Enable back mic fix
++persist.sys.phh.disable_back_mic
+-- 
+2.17.1
+

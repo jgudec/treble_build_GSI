@@ -1,4 +1,4 @@
-From d0576e99e9daee7cd8c6b724c74aae92cbb4bba3 Mon Sep 17 00:00:00 2001
+From 328712560cb111ddf81789ea3fb0b08b02f3c77b Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Sat, 11 Feb 2023 18:41:02 +0000
 Subject: [PATCH 1/2] Add options for min/max refresh rate
@@ -13,10 +13,10 @@ Tailored to the Samsung Galaxy S22 refresh rate capabilities
  create mode 100644 app/src/main/res/values/arrays.xml
 
 diff --git a/app/src/main/java/me/phh/treble/app/Misc.kt b/app/src/main/java/me/phh/treble/app/Misc.kt
-index 92e7eb9..289d759 100644
+index 9731e03..0378a39 100644
 --- a/app/src/main/java/me/phh/treble/app/Misc.kt
 +++ b/app/src/main/java/me/phh/treble/app/Misc.kt
-@@ -261,6 +261,17 @@ object Misc: EntryStartup {
+@@ -257,6 +257,17 @@ object Misc: EntryStartup {
                  val value = sp.getString(key, "00ff00")
                  SystemProperties.set("persist.sys.phh.fod_color", value)
              }
@@ -34,7 +34,7 @@ index 92e7eb9..289d759 100644
          }
      }
  
-@@ -288,5 +299,7 @@ object Misc: EntryStartup {
+@@ -284,5 +295,7 @@ object Misc: EntryStartup {
          spListener.onSharedPreferenceChanged(sp, MiscSettings.noHwcomposer)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.storageFUSE)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.dt2w)
@@ -43,10 +43,10 @@ index 92e7eb9..289d759 100644
      }
  }
 diff --git a/app/src/main/java/me/phh/treble/app/MiscSettings.kt b/app/src/main/java/me/phh/treble/app/MiscSettings.kt
-index dc8cce4..9493284 100644
+index 07f4956..ff89866 100644
 --- a/app/src/main/java/me/phh/treble/app/MiscSettings.kt
 +++ b/app/src/main/java/me/phh/treble/app/MiscSettings.kt
-@@ -39,6 +39,8 @@ object MiscSettings : Settings {
+@@ -38,6 +38,8 @@ object MiscSettings : Settings {
      val dt2w = "key_misc_dt2w"
      val restartSystemUI = "key_misc_restart_systemui"
      val fodColor = "key_misc_fod_color"
@@ -84,7 +84,7 @@ index 0000000..dcfaadd
 +</resources>
 \ No newline at end of file
 diff --git a/app/src/main/res/xml/pref_misc.xml b/app/src/main/res/xml/pref_misc.xml
-index 9ff572f..53ba869 100644
+index 70dd45e..10bff97 100644
 --- a/app/src/main/res/xml/pref_misc.xml
 +++ b/app/src/main/res/xml/pref_misc.xml
 @@ -53,6 +53,18 @@

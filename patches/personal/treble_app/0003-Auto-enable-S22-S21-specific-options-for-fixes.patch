@@ -1,19 +1,19 @@
-From b7931f0b330adc68d3a259a231486574453fa9bc Mon Sep 17 00:00:00 2001
+From f7a1753d85e53d0803975ea8c6df79469e8d98e2 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Sat, 11 Feb 2023 18:45:05 +0000
 Subject: [PATCH 2/2] Auto-enable S22/S21 specific options for fixes
 
 ---
  app/src/main/java/me/phh/treble/app/Misc.kt   | 24 +++++++++++++++++++
- .../main/java/me/phh/treble/app/Samsung.kt    | 19 +++++++++++++++
+ .../main/java/me/phh/treble/app/Samsung.kt    | 16 +++++++++++++
  app/src/main/res/xml/pref_misc.xml            |  4 ++--
- 3 files changed, 45 insertions(+), 2 deletions(-)
+ 3 files changed, 42 insertions(+), 2 deletions(-)
 
 diff --git a/app/src/main/java/me/phh/treble/app/Misc.kt b/app/src/main/java/me/phh/treble/app/Misc.kt
-index 289d759..e4c8b10 100644
+index 0378a39..69ebbf0 100644
 --- a/app/src/main/java/me/phh/treble/app/Misc.kt
 +++ b/app/src/main/java/me/phh/treble/app/Misc.kt
-@@ -301,5 +301,29 @@ object Misc: EntryStartup {
+@@ -297,5 +297,29 @@ object Misc: EntryStartup {
          spListener.onSharedPreferenceChanged(sp, MiscSettings.dt2w)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.minHz)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.maxHz)
@@ -44,10 +44,10 @@ index 289d759..e4c8b10 100644
      }
  }
 diff --git a/app/src/main/java/me/phh/treble/app/Samsung.kt b/app/src/main/java/me/phh/treble/app/Samsung.kt
-index 16e2379..aab2f6d 100644
+index 207e801..f087a4b 100644
 --- a/app/src/main/java/me/phh/treble/app/Samsung.kt
 +++ b/app/src/main/java/me/phh/treble/app/Samsung.kt
-@@ -123,6 +123,25 @@ class Samsung: EntryStartup {
+@@ -152,6 +152,22 @@ class Samsung: EntryStartup {
              } catch (t: Throwable) { }
          }
  
@@ -59,14 +59,11 @@ index 16e2379..aab2f6d 100644
 +            if(!sp.getBoolean(SamsungSettings.cameraIds,false)){
 +                sp.edit().putBoolean(SamsungSettings.cameraIds , true).apply()
 +            }
-+            if(!sp.getBoolean(SamsungSettings.alternateAudioPolicy,false)){
-+                sp.edit().putBoolean(SamsungSettings.alternateAudioPolicy , true).apply()
-+            }
-+            if(!sp.getBoolean(SamsungSettings.highBrightess,false)){
-+                sp.edit().putBoolean(SamsungSettings.highBrightess , true).apply()
-+            }
 +            if(!sp.getBoolean(SamsungSettings.brokenFingerprint,false)){
 +                sp.edit().putBoolean(SamsungSettings.brokenFingerprint , true).apply()
++            }
++            if(!sp.getBoolean(SamsungSettings.disableBackMic,false)){
++                sp.edit().putBoolean(SamsungSettings.disableBackMic , true).apply()
 +            }
 +        }
 +
@@ -74,7 +71,7 @@ index 16e2379..aab2f6d 100644
  
      companion object: EntryStartup {
 diff --git a/app/src/main/res/xml/pref_misc.xml b/app/src/main/res/xml/pref_misc.xml
-index 53ba869..0463f35 100644
+index 10bff97..3547139 100644
 --- a/app/src/main/res/xml/pref_misc.xml
 +++ b/app/src/main/res/xml/pref_misc.xml
 @@ -54,13 +54,13 @@
