@@ -1,0 +1,25 @@
+From e5edb0c7e9092fe6cd68a1e0c01090c370c45c4f Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sat, 11 Feb 2023 16:34:37 +0000
+Subject: [PATCH 3/3] Address some safetynet issues
+
+---
+ base.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/base.mk b/base.mk
+index fd10ad7..797d406 100644
+--- a/base.mk
++++ b/base.mk
+@@ -70,7 +70,7 @@ PRODUCT_COPY_FILES += \
+ 	device/phh/treble/fixSPL/getSPL.arm:system/bin/getSPL
+ 
+ PRODUCT_COPY_FILES += \
+-	device/phh/treble/empty:system/phh/empty \
++	device/phh/treble/empty:system/phh/secure/empty \
+ 	device/phh/treble/phh-on-boot.sh:system/bin/phh-on-boot.sh
+ 
+ PRODUCT_PACKAGES += \
+-- 
+2.17.1
+

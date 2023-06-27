@@ -1,0 +1,92 @@
+From 1d73c9b41fd1bbc58973d8dcdc9b2f35f6311a90 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Mon, 26 Jun 2023 20:23:48 +0100
+Subject: [PATCH] Auto-enable S22/S21 specific options for fixes
+
+---
+ app/src/main/java/me/phh/treble/app/Misc.kt   | 21 +++++++++++++++++++
+ .../main/java/me/phh/treble/app/Samsung.kt    | 16 ++++++++++++++
+ app/src/main/res/xml/pref_misc.xml            |  4 ++--
+ 3 files changed, 39 insertions(+), 2 deletions(-)
+
+diff --git a/app/src/main/java/me/phh/treble/app/Misc.kt b/app/src/main/java/me/phh/treble/app/Misc.kt
+index 7a9c506..b4545c2 100644
+--- a/app/src/main/java/me/phh/treble/app/Misc.kt
++++ b/app/src/main/java/me/phh/treble/app/Misc.kt
+@@ -302,5 +302,26 @@ object Misc: EntryStartup {
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.noHwcomposer)
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.storageFUSE)
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.dt2w)
++
++        val c = this.ctxt.get()
++
++        val prop = SystemProperties.get("ro.vendor.build.fingerprint");
++        if( prop.contains("samsung/r0s") || prop.contains("samsung/g0s") || prop.contains("samsung/b0s") || prop.contains("samsung/o1s") || prop.contains("samsung/t2s") || prop.contains("samsung/p3s")){
++            if(!sp.getBoolean(MiscSettings.forceCamera2APIHAL3,false)){
++                sp.edit().putBoolean(MiscSettings.forceCamera2APIHAL3 , true).apply()
++            }
++            if(sp.getString(MiscSettings.minHz,"-1") == "-1"){
++                sp.edit().putString(MiscSettings.minHz , "24").apply()
++            }
++            if(sp.getString(MiscSettings.maxHz,"-1") == "-1"){
++                sp.edit().putString(MiscSettings.maxHz , "120").apply()
++            }
++            if(sp.getString(MiscSettings.roundedCorners,"-1") == "-1"){
++                sp.edit().putString(MiscSettings.roundedCorners , "48").apply()
++            }
++            if(!sp.getBoolean(MiscSettings.sysbta,false)){
++                sp.edit().putBoolean(MiscSettings.sysbta , true).apply()
++            }
++        }
+     }
+ }
+diff --git a/app/src/main/java/me/phh/treble/app/Samsung.kt b/app/src/main/java/me/phh/treble/app/Samsung.kt
+index 207e801..f087a4b 100644
+--- a/app/src/main/java/me/phh/treble/app/Samsung.kt
++++ b/app/src/main/java/me/phh/treble/app/Samsung.kt
+@@ -152,6 +152,22 @@ class Samsung: EntryStartup {
+             } catch (t: Throwable) { }
+         }
+ 
++        val prop = SystemProperties.get("ro.vendor.build.fingerprint");
++        if( prop.contains("samsung/r0s") || prop.contains("samsung/g0s") || prop.contains("samsung/b0s") || prop.contains("samsung/o1s") || prop.contains("samsung/t2s") || prop.contains("samsung/p3s")){
++            if(!sp.getBoolean(SamsungSettings.extraSensors,false)){
++                sp.edit().putBoolean(SamsungSettings.extraSensors , true).apply()
++            }
++            if(!sp.getBoolean(SamsungSettings.cameraIds,false)){
++                sp.edit().putBoolean(SamsungSettings.cameraIds , true).apply()
++            }
++            if(!sp.getBoolean(SamsungSettings.brokenFingerprint,false)){
++                sp.edit().putBoolean(SamsungSettings.brokenFingerprint , true).apply()
++            }
++            if(!sp.getBoolean(SamsungSettings.disableBackMic,false)){
++                sp.edit().putBoolean(SamsungSettings.disableBackMic , true).apply()
++            }
++        }
++
+     }
+ 
+     companion object: EntryStartup {
+diff --git a/app/src/main/res/xml/pref_misc.xml b/app/src/main/res/xml/pref_misc.xml
+index 154dfa3..633f3d2 100644
+--- a/app/src/main/res/xml/pref_misc.xml
++++ b/app/src/main/res/xml/pref_misc.xml
+@@ -54,13 +54,13 @@
+ 			android:key="key_misc_display_fps"
+ 			android:title="Force FPS" />
+ 		<ListPreference
+-			android:defaultValue="10"
++			android:defaultValue="-1"
+ 			android:entries="@array/pref_misc_display_refresh_rate"
+ 			android:entryValues="@array/pref_misc_refresh_rate_values"
+ 			android:key="key_misc_min_hz"
+ 			android:title="Minimum refresh rate" />
+ 		<ListPreference
+-			android:defaultValue="120"
++			android:defaultValue="-1"
+ 			android:entries="@array/pref_misc_display_refresh_rate"
+ 			android:entryValues="@array/pref_misc_refresh_rate_values"
+ 			android:key="key_misc_max_hz"
+-- 
+2.17.1
+

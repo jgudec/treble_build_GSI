@@ -10,7 +10,7 @@ echo
 
 set -e
 
-BL=$PWD/treble_build_evo
+BL=$PWD/treble_build_s22
 BD=$HOME/builds
 
 initRepos() {
@@ -151,12 +151,8 @@ syncRepos
 applyPatches
 setupEnv
 buildTrebleApp
-buildVariant
-buildMiniVariant
-buildPicoVariant
-buildVndkliteVariant
 generatePackages
-generateOta
+#generateOta
 
 END=`date +%s`
 ELAPSEDM=$(($(($END-$START))/60))
