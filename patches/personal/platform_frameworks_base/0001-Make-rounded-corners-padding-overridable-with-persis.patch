@@ -18,19 +18,10 @@ index 5f76c92a939a..49afbdd0392f 100644
  import java.io.PrintWriter;
  import java.util.ArrayList;
 +import android.os.SystemProperties;
- 
- /**
-  * The header group on Keyguard.
-@@ -100,6 +101,8 @@ public class KeyguardStatusBarView extends RelativeLayout {
-      * Draw this many pixels into the left/right side of the cutout to optimally use the space
-      */
-     private int mCutoutSideNudge = 0;
-+	
-+	private int mRoundedCornerPadding = 0;
- 
-     private DisplayCutout mDisplayCutout;
-     // right and left padding applied to this view to account for cutouts and rounded corners
-@@ -204,8 +207,10 @@ public class KeyguardStatusBarView extends RelativeLayout {
+ import android.view.DisplayCutout;
+ import android.view.Gravity;
+ import android.view.View;
+@@ -198,8 +199,10 @@ public class KeyguardStatusBarView extends RelativeLayout {
                  R.dimen.ongoing_appops_dot_min_padding);
          mCutoutSideNudge = getResources().getDimensionPixelSize(
                  R.dimen.display_cutout_margin_consumption);

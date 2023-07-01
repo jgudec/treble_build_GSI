@@ -9,30 +9,19 @@ This reverts commit e340950af19a80bdec5203ddf725a292c36511be.
  1 file changed, 15 insertions(+)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
-index e92cc86ec9c6..5f76c92a939a 100644
+
+index e92cc86ec9c6..2133ebd866da 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
-@@ -168,6 +168,19 @@ public class KeyguardStatusBarView extends RelativeLayout {
-                 mStatusIconContainer.getPaddingBottom()
-         );
+@@ -102,6 +102,7 @@ public class KeyguardStatusBarView extends RelativeLayout {
+     private int mCutoutSideNudge = 0;
  
-+		// Respect font size setting.
-+        mCarrierLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-+                getResources().getDimensionPixelSize(
-+                        com.android.internal.R.dimen.text_size_small_material));
-+        lp = (MarginLayoutParams) mCarrierLabel.getLayoutParams();
-+
-+        int marginStart = calculateMargin(
-+                getResources().getDimensionPixelSize(R.dimen.keyguard_carrier_text_margin),
-+                mPadding.first);
-+        lp.setMarginStart(marginStart);
-+
-+        mCarrierLabel.setLayoutParams(lp);
-+
-         updateKeyguardStatusBarHeight();
-     }
+     private DisplayCutout mDisplayCutout;
++    private int mRoundedCornerPadding = 0;
+     // right and left padding applied to this view to account for cutouts and rounded corners
+     private Pair<Integer, Integer> mPadding = new Pair(0, 0);
  
-@@ -191,6 +204,8 @@ public class KeyguardStatusBarView extends RelativeLayout {
+@@ -191,6 +192,8 @@ public class KeyguardStatusBarView extends RelativeLayout {
                  R.dimen.ongoing_appops_dot_min_padding);
          mCutoutSideNudge = getResources().getDimensionPixelSize(
                  R.dimen.display_cutout_margin_consumption);
