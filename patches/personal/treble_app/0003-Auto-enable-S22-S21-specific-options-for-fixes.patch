@@ -1,30 +1,27 @@
-From f7a1753d85e53d0803975ea8c6df79469e8d98e2 Mon Sep 17 00:00:00 2001
+From 1d73c9b41fd1bbc58973d8dcdc9b2f35f6311a90 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
-Date: Sat, 11 Feb 2023 18:45:05 +0000
-Subject: [PATCH 2/2] Auto-enable S22/S21 specific options for fixes
+Date: Mon, 26 Jun 2023 20:23:48 +0100
+Subject: [PATCH] Auto-enable S22/S21 specific options for fixes
 
 ---
- app/src/main/java/me/phh/treble/app/Misc.kt   | 24 +++++++++++++++++++
- .../main/java/me/phh/treble/app/Samsung.kt    | 16 +++++++++++++
+ app/src/main/java/me/phh/treble/app/Misc.kt   | 21 +++++++++++++++++++
+ .../main/java/me/phh/treble/app/Samsung.kt    | 16 ++++++++++++++
  app/src/main/res/xml/pref_misc.xml            |  4 ++--
- 3 files changed, 42 insertions(+), 2 deletions(-)
+ 3 files changed, 39 insertions(+), 2 deletions(-)
 
 diff --git a/app/src/main/java/me/phh/treble/app/Misc.kt b/app/src/main/java/me/phh/treble/app/Misc.kt
-index 0378a39..69ebbf0 100644
+index 7a9c506..b4545c2 100644
 --- a/app/src/main/java/me/phh/treble/app/Misc.kt
 +++ b/app/src/main/java/me/phh/treble/app/Misc.kt
-@@ -297,5 +297,29 @@ object Misc: EntryStartup {
+@@ -302,5 +302,26 @@ object Misc: EntryStartup {
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.noHwcomposer)
+         spListener.onSharedPreferenceChanged(sp, MiscSettings.storageFUSE)
          spListener.onSharedPreferenceChanged(sp, MiscSettings.dt2w)
-         spListener.onSharedPreferenceChanged(sp, MiscSettings.minHz)
-         spListener.onSharedPreferenceChanged(sp, MiscSettings.maxHz)
 +
 +        val c = this.ctxt.get()
 +
 +        val prop = SystemProperties.get("ro.vendor.build.fingerprint");
 +        if( prop.contains("samsung/r0s") || prop.contains("samsung/g0s") || prop.contains("samsung/b0s") || prop.contains("samsung/o1s") || prop.contains("samsung/t2s") || prop.contains("samsung/p3s")){
-+            if(!sp.getBoolean(MiscSettings.multiCameras,false)){
-+                sp.edit().putBoolean(MiscSettings.multiCameras , true).apply()
-+            }
 +            if(!sp.getBoolean(MiscSettings.forceCamera2APIHAL3,false)){
 +                sp.edit().putBoolean(MiscSettings.forceCamera2APIHAL3 , true).apply()
 +            }
@@ -71,13 +68,13 @@ index 207e801..f087a4b 100644
  
      companion object: EntryStartup {
 diff --git a/app/src/main/res/xml/pref_misc.xml b/app/src/main/res/xml/pref_misc.xml
-index 10bff97..3547139 100644
+index 154dfa3..633f3d2 100644
 --- a/app/src/main/res/xml/pref_misc.xml
 +++ b/app/src/main/res/xml/pref_misc.xml
 @@ -54,13 +54,13 @@
  			android:key="key_misc_display_fps"
  			android:title="Force FPS" />
- 			<ListPreference
+ 		<ListPreference
 -			android:defaultValue="10"
 +			android:defaultValue="-1"
  			android:entries="@array/pref_misc_display_refresh_rate"

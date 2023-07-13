@@ -112,8 +112,6 @@ buildVndkliteVariant() {
 generatePackages() {
     echo "--> Generating packages"
     xz -cv $BD/system-treble_arm64_bvN.img -T0 > $BD/PixelExperience_arm64-ab-13.0-$BUILD_DATE-UNOFFICIAL.img.xz
-    xz -cv $BD/system-treble_arm64_bvN-vndklite.img -T0 > $BD/PixelExperience_arm64-ab-vndklite-13.0-$BUILD_DATE-UNOFFICIAL.img.xz
-    xz -cv $BD/system-treble_arm64_bvN-slim.img -T0 > $BD/PixelExperience_arm64-ab-slim-13.0-$BUILD_DATE-UNOFFICIAL.img.xz
     rm -rf $BD/system-*.img
     echo
 }
@@ -127,8 +125,6 @@ applyPatches
 setupEnv
 buildTrebleApp
 buildVariant
-buildSlimVariant
-buildVndkliteVariant
 generatePackages
 
 END=`date +%s`

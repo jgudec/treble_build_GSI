@@ -1,20 +1,20 @@
-From a12289de95ffd7669962c00fff8a64cf4d365888 Mon Sep 17 00:00:00 2001
+From e8f151d74df0626373e469e8bf7072b2c35a5e3d Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
-Date: Wed, 14 Dec 2022 17:21:00 -0500
-Subject: [PATCH 34/39] Call Samsung's ISehSysInputDev to report screen state
- to touchscreen driver
+Date: Fri, 7 Jul 2023 09:31:34 +0100
+Subject: [PATCH] Call Samsung's ISehSysInputDev to report screen state to
+ touchscreen driver
 
-This fixes touchscreen not waking up on Galaxy F23
+Change-Id: I2cf5b3d5a7c8445b136ae1fe08cc81c03bb4a297
 ---
  services/core/Android.bp                      |  1 +
  .../server/display/LocalDisplayAdapter.java   | 32 +++++++++++++++++++
  2 files changed, 33 insertions(+)
 
 diff --git a/services/core/Android.bp b/services/core/Android.bp
-index 89c8ca567dd9..34a4579855ef 100644
+index 5e952c1709bb..3cec5f493aa1 100644
 --- a/services/core/Android.bp
 +++ b/services/core/Android.bp
-@@ -173,6 +173,7 @@ java_library_static {
+@@ -175,6 +175,7 @@ java_library_static {
          "SurfaceFlingerProperties",
          "com.android.sysprop.watchdog",
          "faceunlock_framework",
@@ -23,36 +23,30 @@ index 89c8ca567dd9..34a4579855ef 100644
      javac_shard_size: 50,
  }
 diff --git a/services/core/java/com/android/server/display/LocalDisplayAdapter.java b/services/core/java/com/android/server/display/LocalDisplayAdapter.java
-index 58a182a61e44..84c3982458ff 100644
+index efb2cb7a3283..74028cd2df3d 100644
 --- a/services/core/java/com/android/server/display/LocalDisplayAdapter.java
 +++ b/services/core/java/com/android/server/display/LocalDisplayAdapter.java
-@@ -33,6 +33,7 @@ import android.os.Trace;
- import android.util.DisplayUtils;
- import android.util.LongSparseArray;
- import android.util.Slog;
-+import android.util.Log;
- import android.util.SparseArray;
- import android.view.Display;
- import android.view.DisplayAddress;
-@@ -48,6 +49,8 @@ import com.android.server.LocalServices;
- import com.android.server.lights.LightsManager;
- import com.android.server.lights.LogicalLight;
+@@ -55,6 +55,9 @@ import java.util.Collections;
+ import java.util.List;
+ import java.util.Objects;
  
 +import vendor.samsung.hardware.sysinput.V1_1.ISehSysInputDev;
++import android.util.Log;
 +
- import java.io.PrintWriter;
- import java.util.ArrayList;
- import java.util.Arrays;
-@@ -228,6 +231,8 @@ final class LocalDisplayAdapter extends DisplayAdapter {
- 
+ /**
+  * A display adapter for the local displays managed by SurfaceFlinger.
+  * <p>
+@@ -227,6 +230,9 @@ final class LocalDisplayAdapter extends DisplayAdapter {
          private DisplayEventReceiver.FrameRateOverride[] mFrameRateOverrides =
                  new DisplayEventReceiver.FrameRateOverride[0];
+ 
 +        private boolean triedSamsungHal = false;
 +        private ISehSysInputDev samsungSysinput = null;
- 
++
          LocalDisplayDevice(IBinder displayToken, long physicalDisplayId,
                  SurfaceControl.StaticDisplayInfo staticDisplayInfo,
-@@ -815,17 +820,44 @@ final class LocalDisplayAdapter extends DisplayAdapter {
+                 SurfaceControl.DynamicDisplayInfo dynamicInfo,
+@@ -812,16 +818,42 @@ final class LocalDisplayAdapter extends DisplayAdapter {
                              }
                              mSidekickActive = false;
                          }
@@ -66,7 +60,7 @@ index 58a182a61e44..84c3982458ff 100644
                          Trace.traceBegin(Trace.TRACE_TAG_POWER, "setDisplayState("
                                  + "id=" + physicalDisplayId
                                  + ", state=" + Display.stateToString(state) + ")");
-+
++                        
 +                        if (samsungSysinput != null) {
 +                            try {
 +                                Log.d("PHH", "setTspEnable 1, " + state + ", true");
@@ -75,7 +69,7 @@ index 58a182a61e44..84c3982458ff 100644
 +                                Log.d("PHH", "Failed settings tsp enable", t);
 +                            }
 +                        }
-+
++                        
                          try {
                              mSurfaceControlProxy.setDisplayPowerMode(token, mode);
                              Trace.traceCounter(Trace.TRACE_TAG_POWER, "DisplayPowerMode", mode);
@@ -92,11 +86,9 @@ index 58a182a61e44..84c3982458ff 100644
 +                            }
 +                        }
 +
-                         setCommittedState(state);
-+
                          // If we're entering a suspended (but not OFF) power state and we
                          // have a sidekick available, tell it now that it can take control.
                          if (Display.isSuspendedState(state) && state != Display.STATE_OFF
 -- 
-2.25.1
+2.17.1
 
