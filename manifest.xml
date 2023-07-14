@@ -7,4 +7,6 @@
   <project name="phhusson/vendor_magisk" path="vendor/magisk" remote="github" revision="android-10.0" />
   <project name="AndyCGYan/android_packages_apps_QcRilAm" path="packages/apps/QcRilAm" remote="github" revision="master" />
   <project name="ponces/sas-creator" path="sas-creator" remote="github" revision="master" />
+  <project name="jgudec/android_packages_apps_RepainterServicePriv" path="packages/apps/RepainterServicePriv" remote="github" revision="main" />
+  <project name="jgudec/android_vendor_lawnchair" path="vendor/lawnchair" remote="github" revision="13" />
 </manifest>

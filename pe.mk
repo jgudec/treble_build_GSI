@@ -1,6 +1,8 @@
 $(call inherit-product, vendor/aosp/config/common_full_phone.mk)
 $(call inherit-product, vendor/aosp/config/BoardConfigSoong.mk)
 $(call inherit-product, device/custom/sepolicy/common/sepolicy.mk)
+$(call inherit-product-if-exists, vendor/lawnchair/lawnchair.mk)
+
 -include vendor/aosp/build/core/config.mk
 
 BOARD_EXT4_SHARE_DUP_BLOCKS := true
@@ -15,3 +17,7 @@ TARGET_HAS_FUSEBLK_SEPOLICY_ON_VENDOR := true
 
 PRODUCT_PACKAGES += \
     androidx.window.extensions
+
+# Repainter integration
+PRODUCT_PACKAGES += \
+    RepainterServicePriv \
