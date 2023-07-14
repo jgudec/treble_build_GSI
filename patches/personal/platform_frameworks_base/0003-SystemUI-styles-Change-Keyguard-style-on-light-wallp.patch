@@ -1,4 +1,4 @@
-From e65f1cb0f385c7ae743f8c51a24c2e8c7cda9959 Mon Sep 17 00:00:00 2001
+From 96217d5fbbe0ed87bdf407d0ad58edd3eb839c7c Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Fri, 21 Apr 2023 16:49:15 +0100
 Subject: [PATCH 2/2] SystemUI: styles: Change Keyguard style on light
@@ -13,10 +13,10 @@ Change-Id: I330143ec335661967df1cc3129b04791891a192f
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/core/java/android/service/wallpaper/WallpaperService.java b/core/java/android/service/wallpaper/WallpaperService.java
-index 2d1a41e92a99..017aa5fd6769 100644
+index 8f1fc1b9348e..e7e9434de9f3 100644
 --- a/core/java/android/service/wallpaper/WallpaperService.java
 +++ b/core/java/android/service/wallpaper/WallpaperService.java
-@@ -285,7 +285,7 @@ public abstract class WallpaperService extends Service {
+@@ -319,7 +319,7 @@ public abstract class WallpaperService extends Service {
          private Context mDisplayContext;
          private int mDisplayState;
          private @Surface.Rotation int mDisplayInstallOrientation;
@@ -26,10 +26,10 @@ index 2d1a41e92a99..017aa5fd6769 100644
          private float mDefaultDimAmount = mWallpaperDimAmount;
  
 diff --git a/packages/SystemUI/res/values/styles.xml b/packages/SystemUI/res/values/styles.xml
-index b11b6d633f14..e726722566a4 100644
+index 27b15c926bbb..2b982d02820a 100644
 --- a/packages/SystemUI/res/values/styles.xml
 +++ b/packages/SystemUI/res/values/styles.xml
-@@ -321,11 +321,11 @@
+@@ -322,11 +322,11 @@
      </style>
  
      <style name="Theme.SystemUI.LightWallpaper">

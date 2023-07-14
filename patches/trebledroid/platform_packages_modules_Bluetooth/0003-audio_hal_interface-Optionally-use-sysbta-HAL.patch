@@ -1,43 +1,41 @@
-From 3c7960fb268b8df1bfe4307d96aa1cec27863820 Mon Sep 17 00:00:00 2001
+From 046edc8ed2fcf972da6cbcd4052ee3e307c88544 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
-Date: Fri, 7 Jul 2023 09:42:45 +0100
+Date: Fri, 14 Jul 2023 12:35:53 +0100
 Subject: [PATCH] audio_hal_interface: Optionally use sysbta HAL
 
-Required to support sysbta, our system-side bt audio implementation.
-
-Change-Id: I163c64ce4b2463e89b7148327d98d9dbba7e9ac0
+Change-Id: I53d3e3d369f00b8315a25fff0cdd9f0ce7100a6f
 ---
- system/audio_hal_interface/aidl/client_interface_aidl.cc | 6 +++---
- system/audio_hal_interface/aidl/client_interface_aidl.h  | 8 +++++++-
- system/audio_hal_interface/hal_version_manager.cc        | 9 ++++++++-
- 3 files changed, 18 insertions(+), 5 deletions(-)
+ .../audio_hal_interface/aidl/client_interface_aidl.cc  |  6 +++---
+ .../audio_hal_interface/aidl/client_interface_aidl.h   |  8 +++++++-
+ system/audio_hal_interface/hal_version_manager.cc      | 10 ++++++++--
+ 3 files changed, 18 insertions(+), 6 deletions(-)
 
 diff --git a/system/audio_hal_interface/aidl/client_interface_aidl.cc b/system/audio_hal_interface/aidl/client_interface_aidl.cc
-index efdc469de4..3dd65b5394 100644
+index 9af28031f7..5a9dbbccad 100644
 --- a/system/audio_hal_interface/aidl/client_interface_aidl.cc
 +++ b/system/audio_hal_interface/aidl/client_interface_aidl.cc
 @@ -56,7 +56,7 @@ BluetoothAudioClientInterface::BluetoothAudioClientInterface(
  
  bool BluetoothAudioClientInterface::is_aidl_available() {
-   auto service = AServiceManager_checkService(
+   return AServiceManager_isDeclared(
 -      kDefaultAudioProviderFactoryInterface.c_str());
 +      audioProviderFactoryInterface().c_str());
-   return (service != nullptr);
  }
  
-@@ -73,7 +73,7 @@ BluetoothAudioClientInterface::GetAudioCapabilities(SessionType session_type) {
+ std::vector<AudioCapabilities>
+@@ -72,7 +72,7 @@ BluetoothAudioClientInterface::GetAudioCapabilities(SessionType session_type) {
    }
    auto provider_factory = IBluetoothAudioProviderFactory::fromBinder(
-       ::ndk::SpAIBinder(AServiceManager_getService(
+       ::ndk::SpAIBinder(AServiceManager_waitForService(
 -          kDefaultAudioProviderFactoryInterface.c_str())));
 +          audioProviderFactoryInterface().c_str())));
  
    if (provider_factory == nullptr) {
      LOG(ERROR) << __func__ << ", can't get capability from unknown factory";
-@@ -101,7 +101,7 @@ void BluetoothAudioClientInterface::FetchAudioProvider() {
+@@ -99,7 +99,7 @@ void BluetoothAudioClientInterface::FetchAudioProvider() {
    }
    auto provider_factory = IBluetoothAudioProviderFactory::fromBinder(
-       ::ndk::SpAIBinder(AServiceManager_getService(
+       ::ndk::SpAIBinder(AServiceManager_waitForService(
 -          kDefaultAudioProviderFactoryInterface.c_str())));
 +          audioProviderFactoryInterface().c_str())));
  
@@ -70,7 +68,7 @@ index 17abefe8fe..b756af9012 100644
    IBluetoothTransportInstance* transport_;
    std::vector<AudioCapabilities> capabilities_;
 diff --git a/system/audio_hal_interface/hal_version_manager.cc b/system/audio_hal_interface/hal_version_manager.cc
-index a2c192f37d..c3d1cf35c2 100644
+index a2c192f37d..834b6a2789 100644
 --- a/system/audio_hal_interface/hal_version_manager.cc
 +++ b/system/audio_hal_interface/hal_version_manager.cc
 @@ -24,6 +24,7 @@
@@ -81,20 +79,21 @@ index a2c192f37d..c3d1cf35c2 100644
  
  namespace bluetooth {
  namespace audio {
-@@ -33,6 +34,12 @@ using ::aidl::android::hardware::bluetooth::audio::
+@@ -33,7 +34,12 @@ using ::aidl::android::hardware::bluetooth::audio::
  
  static const std::string kDefaultAudioProviderFactoryInterface =
      std::string() + IBluetoothAudioProviderFactory::descriptor + "/default";
+-
 +static const std::string kSystemAudioProviderFactoryInterface =
 +    std::string() + IBluetoothAudioProviderFactory::descriptor + "/sysbta";
 +static inline const std::string audioProviderFactoryInterface() {
 +  return osi_property_get_bool("persist.bluetooth.system_audio_hal.enabled", false)
 +    ? kSystemAudioProviderFactoryInterface : kDefaultAudioProviderFactoryInterface;
 +}
- 
  std::unique_ptr<HalVersionManager> HalVersionManager::instance_ptr =
      std::make_unique<HalVersionManager>();
-@@ -92,7 +99,7 @@ HalVersionManager::GetProvidersFactory_2_0() {
+ 
+@@ -92,7 +98,7 @@ HalVersionManager::GetProvidersFactory_2_0() {
  
  HalVersionManager::HalVersionManager() {
    if (AServiceManager_checkService(

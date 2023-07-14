@@ -1,13 +1,13 @@
-From 1d73c9b41fd1bbc58973d8dcdc9b2f35f6311a90 Mon Sep 17 00:00:00 2001
+From e4946b9790087e4df02dc582cf33f3d980baee90 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Mon, 26 Jun 2023 20:23:48 +0100
 Subject: [PATCH] Auto-enable S22/S21 specific options for fixes
 
 ---
  app/src/main/java/me/phh/treble/app/Misc.kt   | 21 +++++++++++++++++++
- .../main/java/me/phh/treble/app/Samsung.kt    | 16 ++++++++++++++
+ .../main/java/me/phh/treble/app/Samsung.kt    | 13 ++++++++++++
  app/src/main/res/xml/pref_misc.xml            |  4 ++--
- 3 files changed, 39 insertions(+), 2 deletions(-)
+ 3 files changed, 36 insertions(+), 2 deletions(-)
 
 diff --git a/app/src/main/java/me/phh/treble/app/Misc.kt b/app/src/main/java/me/phh/treble/app/Misc.kt
 index 7a9c506..b4545c2 100644
@@ -41,18 +41,15 @@ index 7a9c506..b4545c2 100644
      }
  }
 diff --git a/app/src/main/java/me/phh/treble/app/Samsung.kt b/app/src/main/java/me/phh/treble/app/Samsung.kt
-index 207e801..f087a4b 100644
+index 207e801..695130f 100644
 --- a/app/src/main/java/me/phh/treble/app/Samsung.kt
 +++ b/app/src/main/java/me/phh/treble/app/Samsung.kt
-@@ -152,6 +152,22 @@ class Samsung: EntryStartup {
+@@ -152,6 +152,19 @@ class Samsung: EntryStartup {
              } catch (t: Throwable) { }
          }
  
 +        val prop = SystemProperties.get("ro.vendor.build.fingerprint");
 +        if( prop.contains("samsung/r0s") || prop.contains("samsung/g0s") || prop.contains("samsung/b0s") || prop.contains("samsung/o1s") || prop.contains("samsung/t2s") || prop.contains("samsung/p3s")){
-+            if(!sp.getBoolean(SamsungSettings.extraSensors,false)){
-+                sp.edit().putBoolean(SamsungSettings.extraSensors , true).apply()
-+            }
 +            if(!sp.getBoolean(SamsungSettings.cameraIds,false)){
 +                sp.edit().putBoolean(SamsungSettings.cameraIds , true).apply()
 +            }

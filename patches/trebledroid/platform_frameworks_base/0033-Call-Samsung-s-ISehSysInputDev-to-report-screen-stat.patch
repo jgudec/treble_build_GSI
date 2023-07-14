@@ -1,10 +1,10 @@
-From e8f151d74df0626373e469e8bf7072b2c35a5e3d Mon Sep 17 00:00:00 2001
-From: Pierre-Hugues Husson <phh@phh.me>
-Date: Fri, 7 Jul 2023 09:31:34 +0100
+From 6d12d1e47ebdb7c16a193ef7316cb035beecb44d Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Fri, 14 Jul 2023 11:03:14 +0100
 Subject: [PATCH] Call Samsung's ISehSysInputDev to report screen state to
  touchscreen driver
 
-Change-Id: I2cf5b3d5a7c8445b136ae1fe08cc81c03bb4a297
+Change-Id: Ib9e52f45f4e26870045d85fde03196bd89b59463
 ---
  services/core/Android.bp                      |  1 +
  .../server/display/LocalDisplayAdapter.java   | 32 +++++++++++++++++++
@@ -23,7 +23,7 @@ index 5e952c1709bb..3cec5f493aa1 100644
      javac_shard_size: 50,
  }
 diff --git a/services/core/java/com/android/server/display/LocalDisplayAdapter.java b/services/core/java/com/android/server/display/LocalDisplayAdapter.java
-index efb2cb7a3283..74028cd2df3d 100644
+index 58a182a61e44..bff73e2184c8 100644
 --- a/services/core/java/com/android/server/display/LocalDisplayAdapter.java
 +++ b/services/core/java/com/android/server/display/LocalDisplayAdapter.java
 @@ -55,6 +55,9 @@ import java.util.Collections;
@@ -36,7 +36,7 @@ index efb2cb7a3283..74028cd2df3d 100644
  /**
   * A display adapter for the local displays managed by SurfaceFlinger.
   * <p>
-@@ -227,6 +230,9 @@ final class LocalDisplayAdapter extends DisplayAdapter {
+@@ -229,6 +232,9 @@ final class LocalDisplayAdapter extends DisplayAdapter {
          private DisplayEventReceiver.FrameRateOverride[] mFrameRateOverrides =
                  new DisplayEventReceiver.FrameRateOverride[0];
  
@@ -46,7 +46,7 @@ index efb2cb7a3283..74028cd2df3d 100644
          LocalDisplayDevice(IBinder displayToken, long physicalDisplayId,
                  SurfaceControl.StaticDisplayInfo staticDisplayInfo,
                  SurfaceControl.DynamicDisplayInfo dynamicInfo,
-@@ -812,16 +818,42 @@ final class LocalDisplayAdapter extends DisplayAdapter {
+@@ -815,17 +821,43 @@ final class LocalDisplayAdapter extends DisplayAdapter {
                              }
                              mSidekickActive = false;
                          }
@@ -60,7 +60,6 @@ index efb2cb7a3283..74028cd2df3d 100644
                          Trace.traceBegin(Trace.TRACE_TAG_POWER, "setDisplayState("
                                  + "id=" + physicalDisplayId
                                  + ", state=" + Display.stateToString(state) + ")");
-+                        
 +                        if (samsungSysinput != null) {
 +                            try {
 +                                Log.d("PHH", "setTspEnable 1, " + state + ", true");
@@ -85,7 +84,9 @@ index efb2cb7a3283..74028cd2df3d 100644
 +                                Log.d("PHH", "Failed settings tsp enable", t);
 +                            }
 +                        }
-+
++                        
+                         setCommittedState(state);
++                        
                          // If we're entering a suspended (but not OFF) power state and we
                          // have a sidekick available, tell it now that it can take control.
                          if (Display.isSuspendedState(state) && state != Display.STATE_OFF
