@@ -1,0 +1,32 @@
+From e0bf9423019369635d046f57bd1feb7327d2e2a1 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Sat, 5 Aug 2023 18:08:41 +0100
+Subject: [PATCH 3/3] Add props for Xiaomi 13 camcorder
+
+---
+ rw-system.sh | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/rw-system.sh b/rw-system.sh
+index d1b9738..730703b 100644
+--- a/rw-system.sh
++++ b/rw-system.sh
+@@ -1163,4 +1163,15 @@ if getprop ro.boot.hardware.sku | grep -q -e fuxi -e nuwa -e ishtar; then
+ 
+     resetprop_phh persist.sys.sf.hs_mode 0
+ 
++    resetprop_phh vendor.camera.aux.packagelist org.codeaurora.snapcam
++
++    resetprop_phh persist.vendor.camera.privapp.list org.codeaurora.snapcam
++
++    resetprop_phh persist.vendor.camera.aon.cameraId 8
++
++    resetprop_phh persist.vendor.camera.aon8475.cameraId 9
++
++    resetprop_phh ro.media.recorder-max-base-layer-fps 60
++
++    resetprop_phh persist.vendor.camera.maxRAWSizes 19
+ fi
+-- 
+2.17.1
+

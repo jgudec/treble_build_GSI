@@ -1,0 +1,33 @@
+From 10f915f12211615011e416ac33bd3ab059133ad6 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Fri, 4 Aug 2023 13:32:14 +0100
+Subject: [PATCH 2/3] Add props for Xiaomi 13 lineup's Adaptive Refresh Rate
+
+---
+ rw-system.sh | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/rw-system.sh b/rw-system.sh
+index 1be1112..d1b9738 100644
+--- a/rw-system.sh
++++ b/rw-system.sh
+@@ -1151,3 +1151,16 @@ setprop debug.phh.props.omposer-service vendor
+ if getprop ro.vendor.gnsschip |grep -q marlin3lite;then
+     setprop persist.sys.bt.max_vendor_cap 0
+ fi
++
++if getprop ro.boot.hardware.sku | grep -q -e fuxi -e nuwa -e ishtar; then
++    resetprop_phh ro.surface_flinger.set_idle_timer_ms 1000
++
++    resetprop_phh ro.surface_flinger.set_touch_timer_ms 800
++
++    resetprop_phh ro.surface_flinger.set_display_power_timer_ms 4000
++
++    resetprop_phh debug.sf.frame_rate_multiple_threshold 120
++
++    resetprop_phh persist.sys.sf.hs_mode 0
++
++fi
+-- 
+2.17.1
+
