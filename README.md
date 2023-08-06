@@ -21,7 +21,7 @@ To get started with building Pixel Experience GSI, you'll need to get familiar w
 
 ## Credits
 These people have helped this project in some way or another, so they should be the ones who receive all the credit:
-- [Pixel Experience Team](https://download.pixelexperience.org/about)
+- [KoysX](https://github.com/KoysX)
 - [phhusson](https://github.com/phhusson)
 - [AndyYan](https://github.com/AndyCGYan)
 - [eremitein](https://github.com/eremitein)

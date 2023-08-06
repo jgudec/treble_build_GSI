@@ -1,14 +1,14 @@
-From 47a0f52770aa914fc76bfab98a1df10cda0c33c5 Mon Sep 17 00:00:00 2001
+From 6755ef437b4e1d2c76114c96589056e94f2e1ff9 Mon Sep 17 00:00:00 2001
 From: KoysX <2685697179b@gmail.com>
 Date: Mon, 31 Jul 2023 13:04:16 +0800
-Subject: [PATCH] add-zh-rCN
+Subject: [PATCH 2/2] add-zh-rCN
 
 ---
  res/values-zh-rCN/derp_strings.xml | 41 +++++++++++++++++++++++++-----
  1 file changed, 35 insertions(+), 6 deletions(-)
 
 diff --git a/res/values-zh-rCN/derp_strings.xml b/res/values-zh-rCN/derp_strings.xml
-index a57a077..a311d30 100644
+index a57a077173..a311d30bc4 100644
 --- a/res/values-zh-rCN/derp_strings.xml
 +++ b/res/values-zh-rCN/derp_strings.xml
 @@ -28,7 +28,12 @@
@@ -111,5 +111,5 @@ index a57a077..a311d30 100644
  </resources>
 +
 -- 
-2.34.1
+2.17.1
 
