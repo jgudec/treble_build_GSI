@@ -1,4 +1,4 @@
-From 2308c3ce14eb8792f0e4d2bce6605e03a0d03058 Mon Sep 17 00:00:00 2001
+From 41ea1441d57c7d3e745ae5aef9f857ccf0510115 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Fri, 4 Aug 2023 13:29:55 +0100
 Subject: [PATCH] Add initial Xiaomi FOD implementation for recent Xiaomi
@@ -120,7 +120,7 @@ index dc2e4c3597fb..f88bfc4175eb 100644
      javac_shard_size: 50,
  }
 diff --git a/services/core/java/com/android/server/biometrics/AuthService.java b/services/core/java/com/android/server/biometrics/AuthService.java
-index b47b47c41f76..0b3162cf97d4 100644
+index b47b47c41f76..745a631d9d1e 100644
 --- a/services/core/java/com/android/server/biometrics/AuthService.java
 +++ b/services/core/java/com/android/server/biometrics/AuthService.java
 @@ -91,6 +91,8 @@ import vendor.samsung.hardware.biometrics.fingerprint.V3_0.ISehBiometricsFingerp
@@ -200,7 +200,7 @@ index b47b47c41f76..0b3162cf97d4 100644
 +
 +            String[] widthHeight = android.os.SystemProperties.get("persist.vendor.sys.fp.fod.size.width_height").split(",");
 +
-+            udfpsProps[2] = (Integer.parseInt(widthHeight[0]) /2) - 10;
++            udfpsProps[2] = (Integer.parseInt(widthHeight[0]) /2);
 +            return udfpsProps;
 +        }
 +

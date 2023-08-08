@@ -24,6 +24,13 @@ export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 BUILD="DerpFest"
 DERPMK="$BL/derp.mk"
 
+SYNC=true
+
+if [ $1 == "nosync" ]
+then
+    SYNC=false
+fi
+
 initRepos() {
     if [ ! -d .repo ]; then
         echo "--> Initializing workspace"
@@ -99,12 +106,12 @@ generatePackages() {
 START=`date +%s`
 BUILD_DATE="$(date +%Y%m%d)"
 
-if [ $1 != "nosync" ]
+if ${SYNC}
 then
-echo "ATTENTION: syncing/patching skipped!"
-initRepos
-syncRepos
-applyPatches
+    echo "ATTENTION: syncing/patching skipped!"
+    initRepos
+    syncRepos
+    applyPatches
 fi
 setupEnv
 buildTrebleApp
