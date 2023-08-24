@@ -4,7 +4,7 @@ echo
 echo "--------------------------------------"
 echo " Pixel Experience Plus 13.0 Buildbot  "
 echo "                  by                  "
-echo "                ponces                "
+echo "                jgudec                "
 echo "--------------------------------------"
 echo
 
@@ -12,6 +12,20 @@ set -e
 
 BL=$PWD/treble_build_pe
 BD=$HOME/builds
+
+export USE_CCACHE=1
+export CCACHE_COMPRESS=1
+export CCACHE_EXEC=/usr/bin/ccache
+export CCACHE_DIR=/mnt/ccache
+export CCACHE_EXEC=$(command -v ccache)
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+SYNC=true
+
+if [ $1 == "nosync" ]
+then
+    SYNC=false
+fi
 
 initRepos() {
     if [ ! -d .repo ]; then
@@ -72,28 +86,9 @@ buildTrebleApp() {
 buildVariant() {
     echo "--> Building treble_arm64_bvN"
     lunch treble_arm64_bvN-userdebug
-    make -j$(nproc --all) installclean
+    # make -j$(nproc --all) installclean
     make -j$(nproc --all) systemimage
     mv $OUT/system.img $BD/system-treble_arm64_bvN.img
-    echo
-}
-
-buildSlimVariant() {
-    echo "--> Building treble_arm64_bvN-slim"
-    (cd vendor/gms && git am $BL/patches/slim.patch)
-    make -j$(nproc --all) systemimage
-    (cd vendor/gms && git reset --hard HEAD~1)
-    mv $OUT/system.img $BD/system-treble_arm64_bvN-slim.img
-    echo
-}
-
-buildVndkliteVariant() {
-    echo "--> Building treble_arm64_bvN-vndklite"
-    cd sas-creator
-    sudo bash lite-adapter.sh 64 $BD/system-treble_arm64_bvN.img
-    cp s.img $BD/system-treble_arm64_bvN-vndklite.img
-    sudo rm -rf s.img d tmp
-    cd ..
     echo
 }
 
@@ -101,8 +96,6 @@ generatePackages() {
     echo "--> Generating packages"
     buildDate="$(date +%Y%m%d)"
     xz -cv $BD/system-treble_arm64_bvN.img -T0 > $BD/PixelExperience_Plus_arm64-ab-13.0-$buildDate-UNOFFICIAL.img.xz
-    xz -cv $BD/system-treble_arm64_bvN-vndklite.img -T0 > $BD/PixelExperience_Plus_arm64-ab-vndklite-13.0-$buildDate-UNOFFICIAL.img.xz
-    xz -cv $BD/system-treble_arm64_bvN-slim.img -T0 > $BD/PixelExperience_Plus_arm64-ab-slim-13.0-$buildDate-UNOFFICIAL.img.xz
     rm -rf $BD/system-*.img
     echo
 }
@@ -115,15 +108,10 @@ generateOta() {
     find $BD/ -name "PixelExperience_Plus_*" | sort | {
         while read file; do
             filename="$(basename $file)"
-            if [[ $filename == *"vndklite"* ]]; then
-                name="treble_arm64_bvN-vndklite"
-            elif [[ $filename == *"slim"* ]]; then
-                name="treble_arm64_bvN-slim"
-            else
-                name="treble_arm64_bvN"
-            fi
+            
+            name="treble_arm64_bvN"
             size=$(wc -c $file | awk '{print $1}')
-            url="https://github.com/ponces/treble_build_pe/releases/download/$version-plus/$filename"
+            url="https://github.com/jgudec/treble_build_GSI/releases/download/$version-plus/$filename"
             json="${json} {\"name\": \"$name\",\"size\": \"$size\",\"url\": \"$url\"},"
         done
         json="${json%?}]}"
@@ -134,14 +122,15 @@ generateOta() {
 
 START=$(date +%s)
 
-initRepos
-syncRepos
-applyPatches
+if ${SYNC}
+then
+    initRepos
+    syncRepos
+    applyPatches
+fi
 setupEnv
 buildTrebleApp
 buildVariant
-buildSlimVariant
-buildVndkliteVariant
 generatePackages
 generateOta
 

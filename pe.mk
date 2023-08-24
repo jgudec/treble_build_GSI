@@ -17,4 +17,4 @@ PRODUCT_PACKAGES += \
     androidx.window.extensions
 
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-    ro.system.ota.json_url=https://raw.githubusercontent.com/ponces/treble_build_pe/thirteen-plus/ota.json
+    ro.system.ota.json_url=https://raw.githubusercontent.com/jgudec/treble_build_GSI/thirteen-plus/ota.json

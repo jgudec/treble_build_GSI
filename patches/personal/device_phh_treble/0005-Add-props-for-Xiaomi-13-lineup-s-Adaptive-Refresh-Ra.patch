@@ -1,0 +1,45 @@
+From b2c8466eee298449767b32b5713345f1a9c12ac8 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Fri, 4 Aug 2023 13:32:14 +0100
+Subject: [PATCH 3/3] Add props for Xiaomi 13 lineup's Adaptive Refresh Rate
+ and FOD
+
+---
+ rw-system.sh | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/rw-system.sh b/rw-system.sh
+index 1be1112..ed68678 100644
+--- a/rw-system.sh
++++ b/rw-system.sh
+@@ -1151,3 +1151,27 @@ setprop debug.phh.props.omposer-service vendor
+ if getprop ro.vendor.gnsschip |grep -q marlin3lite;then
+     setprop persist.sys.bt.max_vendor_cap 0
+ fi
++
++if getprop ro.boot.hardware.sku | grep -q -e fuxi -e nuwa -e ishtar; then
++    setprop ro.surface_flinger.set_idle_timer_ms 1000
++
++    setprop ro.surface_flinger.set_touch_timer_ms 800
++
++    setprop ro.surface_flinger.set_display_power_timer_ms 4000
++
++    setprop debug.sf.frame_rate_multiple_threshold 120
++
++    setprop vendor.camera.aux.packagelist org.codeaurora.snapcam
++
++    setprop persist.vendor.camera.privapp.list org.codeaurora.snapcam
++
++    setprop persist.vendor.camera.aon.cameraId 8
++
++    setprop persist.vendor.camera.aon8475.cameraId 9
++
++    setprop ro.media.recorder-max-base-layer-fps 60
++
++    setprop persist.vendor.camera.maxRAWSizes 19
++
++    setprop phh.xiaomi.fod.enrollment.id 4
++fi
+-- 
+2.17.1
+
