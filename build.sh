@@ -103,24 +103,6 @@ generatePackages() {
     echo
 }
 
-generateOta() {
-    version="$(date +v%Y.%m.%d)"
-    timestamp="$START"
-    json="{\"version\": \"$version\",\"date\": \"$timestamp\",\"variants\": ["
-    find $BD/ -name "DerpFest_*" | sort | {
-        while read file; do
-            filename="$(basename $file)"
-            name="treble_arm64_bvN"
-            size=$(wc -c $file | awk '{print $1}')
-            url="https://github.com/jgudec/treble_build_GSI/releases/download/$version/$filename"
-            json="${json} {\"name\": \"$name\",\"size\": \"$size\",\"url\": \"$url\"}"
-        done
-        json="${json%?}}]}"
-        echo "$json" | jq . > $BL/ota.json
-    }
-    echo
-}
-
 START=`date +%s`
 BUILD_DATE="$(date +%Y%m%d)"
 
@@ -135,8 +117,6 @@ setupEnv
 buildTrebleApp
 buildVariant
 generatePackages
-generateOta
-
 
 END=`date +%s`
 ELAPSEDM=$(($(($END-$START))/60))
