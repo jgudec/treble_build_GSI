@@ -14,7 +14,7 @@ index 5b1bdf7..e33570b 100644
 @@ -273,7 +273,7 @@ static int process_config(VolumeManager* vm, VoldConfigs* configs) {
              int partnum = entry.partnum;
              int flags = 0;
-
+ 
 -            if (entry.is_encryptable()) {
 +            if (entry.is_encryptable() || true) {
                  flags |= android::vold::Disk::Flags::kAdoptable;
@@ -22,3 +22,4 @@ index 5b1bdf7..e33570b 100644
              }
 -- 
 2.34.1
+

@@ -1,0 +1,41 @@
+From 9964288f261e06730f62958e7de2317b641c61c7 Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Fri, 25 Aug 2023 14:31:29 +0100
+Subject: [PATCH 3/3] Set TrebleApp's UpdaterActivity as the default OTA one
+
+---
+ res/values/derp_strings.xml                                   | 4 ++--
+ .../settings/system/SystemUpdatePreferenceController.java     | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/res/values/derp_strings.xml b/res/values/derp_strings.xml
+index 5f73628a55..b26ae1d64a 100644
+--- a/res/values/derp_strings.xml
++++ b/res/values/derp_strings.xml
+@@ -27,8 +27,8 @@
+     <!-- DerpFest Updater -->
+     <string name="update_settings_title">DerpFest Updater</string>
+     <string name="update_settings_summary">Check for the latest version of DerpFest</string>
+-    <string name="update_package" translatable="false">org.lineageos.updater</string>
+-    <string name="update_activity" translatable="false">org.lineageos.updater.UpdatesActivity</string>
++    <string name="update_package" translatable="false">me.phh.treble.app</string>
++    <string name="update_activity" translatable="false">me.phh.treble.app.UpdaterActivity</string>
+ 
+     <!-- Summary text for system preference tile, showing important setting items under system setting [CHAR LIMIT=NONE]-->
+     <string name="system_dashboard_custom_summary">Languages, gestures, updater, time, backup</string>
+diff --git a/src/com/android/settings/system/SystemUpdatePreferenceController.java b/src/com/android/settings/system/SystemUpdatePreferenceController.java
+index b906195a15..0e9a95240e 100644
+--- a/src/com/android/settings/system/SystemUpdatePreferenceController.java
++++ b/src/com/android/settings/system/SystemUpdatePreferenceController.java
+@@ -64,7 +64,7 @@ public class SystemUpdatePreferenceController extends BasePreferenceController {
+                 ? AVAILABLE
+                 : UNSUPPORTED_ON_DEVICE;
+         */
+-        return UNSUPPORTED_ON_DEVICE;
++        return AVAILABLE;
+     }
+ 
+     @Override
+-- 
+2.17.1
+
