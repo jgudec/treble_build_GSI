@@ -1,11 +1,11 @@
 {
-  "version": "v2023.08.25",
-  "date": "1692987214",
+  "version": "v2023.08.25-1",
+  "date": "1692997737",
   "variants": [
     {
       "name": "treble_arm64_bvN",
-      "size": "1570689772",
-      "url": "https://github.com/jgudec/treble_build_GSI/releases/download/v2023.08.25/DerpFest_arm64-ab-13.0-20230825-UNOFFICIAL.img.xz"
+      "size": "1570705080",
+      "url": "https://github.com/jgudec/treble_build_GSI/releases/download/v2023.08.25-1/DerpFest_arm64-ab-13.0-20230825-UNOFFICIAL.img.xz"
     }
   ]
 }
