@@ -1,12 +1,8 @@
-From 41ea1441d57c7d3e745ae5aef9f857ccf0510115 Mon Sep 17 00:00:00 2001
+From 2d77c888acac9447455869336389396fb0cf15c9 Mon Sep 17 00:00:00 2001
 From: jgudec <jakov.gudec@gmail.com>
 Date: Fri, 4 Aug 2023 13:29:55 +0100
-Subject: [PATCH] Add initial Xiaomi FOD implementation for recent Xiaomi
+Subject: [PATCH 6/7] Add initial Xiaomi FOD implementation for recent Xiaomi
  devices
-
-Tested and confirmed to be working on Xiaomi 13 and Xiaomi 13 Pro.
-
-Depends on commit e5ce438e6efbb5b3df7d1d01da585a66d360f1d0
 
 Huge thanks to phhusson for the help and guidance.
 ---
@@ -30,7 +26,7 @@ index 13a86a607947..378c459e027a 100644
      manifest: "AndroidManifest.xml",
      additional_manifests: ["DerpFestManifest.xml"],
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.kt b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.kt
-index ba8016fd48da..8ec1fde9b367 100644
+index ba8016fd48da..11ee67fd461a 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.kt
 +++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.kt
 @@ -37,6 +37,12 @@ import java.io.File
@@ -68,7 +64,7 @@ index ba8016fd48da..8ec1fde9b367 100644
 +            Log.d("PHH-Enroll", "Xiaomi scenario in UdfpsView reached!")
 +            mySurfaceView.setVisibility(INVISIBLE)
 +
-+            IXiaomiFingerprint.getService().extCmd(4, 1);
++            IXiaomiFingerprint.getService().extCmd(android.os.SystemProperties.getInt("persist.phh.xiaomi.fod.enrollment.id", 4), 1);
 +
 +            var res = ITouchFeature.getService().setTouchMode(0, 10, 1);
 +
@@ -102,7 +98,7 @@ index ba8016fd48da..8ec1fde9b367 100644
              };
              fodFileObserver?.startWatching();
 +        } else if(hasXiaomiLhbm) {
-+            IXiaomiFingerprint.getService().extCmd(4, 0);
++            IXiaomiFingerprint.getService().extCmd(android.os.SystemProperties.getInt("persist.phh.xiaomi.fod.enrollment.id", 4), 0);
 +            ITouchFeature.getService().setTouchMode(0, 10, 0);
          } else {
              dimUpdate(0.0f)
@@ -120,7 +116,7 @@ index dc2e4c3597fb..f88bfc4175eb 100644
      javac_shard_size: 50,
  }
 diff --git a/services/core/java/com/android/server/biometrics/AuthService.java b/services/core/java/com/android/server/biometrics/AuthService.java
-index b47b47c41f76..745a631d9d1e 100644
+index b47b47c41f76..150edab79651 100644
 --- a/services/core/java/com/android/server/biometrics/AuthService.java
 +++ b/services/core/java/com/android/server/biometrics/AuthService.java
 @@ -91,6 +91,8 @@ import vendor.samsung.hardware.biometrics.fingerprint.V3_0.ISehBiometricsFingerp
@@ -172,10 +168,10 @@ index b47b47c41f76..745a631d9d1e 100644
 +                    try {
 +                    if("0".equals(isFodPressed)) {
 +                        Slog.d("PHH-Enroll", "Fod un-pressed!");
-+                        mXiaomiFingerprint.extCmd(4, 0);
++                        mXiaomiFingerprint.extCmd(android.os.SystemProperties.getInt("persist.phh.xiaomi.fod.enrollment.id", 4), 0);
 +                    } else if("1".equals(isFodPressed)) {
 +                        Slog.d("PHH-Enroll", "Fod pressed!");
-+                        mXiaomiFingerprint.extCmd(4, 1);
++                        mXiaomiFingerprint.extCmd(android.os.SystemProperties.getInt("persist.phh.xiaomi.fod.enrollment.id", 4), 1);
 +                    }
 +                    } catch(Exception e) {
 +                        Slog.d("PHH-Enroll", "Failed Xiaomi async extcmd", e);

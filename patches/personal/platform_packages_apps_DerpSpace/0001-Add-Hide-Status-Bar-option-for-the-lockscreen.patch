@@ -1,7 +1,7 @@
-From 66ddae65acf4740eb29f7f4886e441422920e0ca Mon Sep 17 00:00:00 2001
-From: KoysX <2685697179b@gmail.com>
-Date: Mon, 31 Jul 2023 11:46:12 +0800
-Subject: [PATCH] add-hide-status-bar-on-lock-screen
+From 17881deec79c5169959039834dc476e9b27fc70a Mon Sep 17 00:00:00 2001
+From: jgudec <jakov.gudec@gmail.com>
+Date: Thu, 24 Aug 2023 21:32:01 +0100
+Subject: [PATCH 1/4] Add Hide Status Bar option for the lockscreen
 
 ---
  res/values/strings.xml    | 4 ++++
@@ -9,27 +9,27 @@ Subject: [PATCH] add-hide-status-bar-on-lock-screen
  2 files changed, 10 insertions(+)
 
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index a8abb31..9e81a31 100644
+index 65b75582..e6a9827a 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
-@@ -582,4 +582,8 @@
- 
-     <!-- QS battery -->
-     <string name="qs_use_status_bar_battery_style">Follow status bar style</string>
+@@ -590,4 +590,8 @@
+     <!-- Custom Data icons -->
+     <string name="theme_customization_data_title">Data icon style</string>
+     <string name="theme_customization_data_summary">Set custom data icon style</string>
 +
 +    <!-- Hide statusbar on lockscreen -->
 +    <string name="lockscreen_hide_status_bar_title">Hide Statusbar</string>
 +    <string name="lockscreen_hide_status_bar_summary">When enabled, statusbar will be hidden on lockscreen</string>
  </resources>
 diff --git a/res/xml/lockscreen_ui.xml b/res/xml/lockscreen_ui.xml
-index 822d33d..c16cf19 100644
+index 822d33d5..d764a815 100644
 --- a/res/xml/lockscreen_ui.xml
 +++ b/res/xml/lockscreen_ui.xml
 @@ -37,6 +37,12 @@
              android:summary="@string/disable_fingerprint_ripple_effect_summary"
              android:defaultValue="false" />
  
-+        <org.derpfest.support.preferences.SystemSettingSwitchPreference
++            <org.derpfest.support.preferences.SystemSettingSwitchPreference
 +            android:key="lockscreen_hide_status_bar"
 +            android:title="@string/lockscreen_hide_status_bar_title"
 +            android:summary="@string/lockscreen_hide_status_bar_summary"
@@ -39,5 +39,5 @@ index 822d33d..c16cf19 100644
              android:key="android.theme.customization.lockscreen_clock_font"
              android:title="@string/theme_customization_lock_clock_title"
 -- 
-2.34.1
+2.17.1
 

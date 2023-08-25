@@ -1,14 +1,14 @@
-From 2d82e16bd3da008a352914e7316e70aca2e5aed0 Mon Sep 17 00:00:00 2001
+From c398e1bdfe62d650351ac0c16a1d6d6f6d004665 Mon Sep 17 00:00:00 2001
 From: KoysX <2685697179b@gmail.com>
 Date: Mon, 31 Jul 2023 12:22:21 +0800
-Subject: [PATCH] add-Chinese-translation
+Subject: [PATCH 4/4] add-Chinese-translation
 
 ---
  res/values-zh-rCN/strings.xml | 22 +++++++++++++++++++++-
  1 file changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/res/values-zh-rCN/strings.xml b/res/values-zh-rCN/strings.xml
-index 4d774fc..6b0e180 100644
+index 4d774fc0..6b0e180e 100644
 --- a/res/values-zh-rCN/strings.xml
 +++ b/res/values-zh-rCN/strings.xml
 @@ -374,6 +374,7 @@
@@ -53,5 +53,5 @@ index 4d774fc..6b0e180 100644
 +    <string name="kg_big_clock_text_size_title">双线锁屏时钟尺寸</string>
  </resources>
 -- 
-2.34.1
+2.17.1
 

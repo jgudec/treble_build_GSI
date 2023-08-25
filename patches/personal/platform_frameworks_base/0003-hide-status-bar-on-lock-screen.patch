@@ -1,7 +1,7 @@
-From 13e46c03aae5f064e20e5bac102c14b3200e2170 Mon Sep 17 00:00:00 2001
+From 41462b5d0a7db3294e25a3539b720d8fe6620202 Mon Sep 17 00:00:00 2001
 From: KoysX <2685697179b@gmail.com>
 Date: Fri, 21 Jul 2023 09:18:17 +0800
-Subject: [PATCH] hide-status-bar-on-lock-screen
+Subject: [PATCH 3/7] hide-status-bar-on-lock-screen
 
 ---
  core/java/android/provider/Settings.java      |   5 +
@@ -12,10 +12,10 @@ Subject: [PATCH] hide-status-bar-on-lock-screen
  5 files changed, 111 insertions(+), 1 deletion(-)
 
 diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
-index a480f280..e041e51c 100644
+index 31eb9628bd12..525ae3410242 100644
 --- a/core/java/android/provider/Settings.java
 +++ b/core/java/android/provider/Settings.java
-@@ -6589,6 +6589,11 @@ public final class Settings {
+@@ -6583,6 +6583,11 @@ public final class Settings {
           */
          public static final String STATUSBAR_CLOCK_CHIP ="statusbar_clock_chip";
  
@@ -28,7 +28,7 @@ index a480f280..e041e51c 100644
           * @hide
           */
 diff --git a/packages/SettingsProvider/src/android/provider/settings/backup/SystemSettings.java b/packages/SettingsProvider/src/android/provider/settings/backup/SystemSettings.java
-index 37fef189..4ae33675 100644
+index 37fef189f975..4ae336756573 100644
 --- a/packages/SettingsProvider/src/android/provider/settings/backup/SystemSettings.java
 +++ b/packages/SettingsProvider/src/android/provider/settings/backup/SystemSettings.java
 @@ -110,6 +110,7 @@ public class SystemSettings {
@@ -40,10 +40,10 @@ index 37fef189..4ae33675 100644
          Settings.System.QS_PANEL_STYLE,
      };
 diff --git a/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java b/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java
-index b42a337e..86c85002 100644
+index b12af147c952..a826eafe97e6 100644
 --- a/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java
 +++ b/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java
-@@ -264,6 +264,7 @@ public class SystemSettingsValidators {
+@@ -263,6 +263,7 @@ public class SystemSettingsValidators {
                      }
                  });
          VALIDATORS.put(System.DISABLE_RIPPLE_EFFECT, BOOLEAN_VALIDATOR);
@@ -52,10 +52,10 @@ index b42a337e..86c85002 100644
                  new Validator() {
                      @Override
 diff --git a/packages/SystemUI/src/com/android/systemui/shade/NotificationPanelViewController.java b/packages/SystemUI/src/com/android/systemui/shade/NotificationPanelViewController.java
-index b7b6bcbd..64221b97 100644
+index dc04dc2afaf3..ce762e3537e1 100644
 --- a/packages/SystemUI/src/com/android/systemui/shade/NotificationPanelViewController.java
 +++ b/packages/SystemUI/src/com/android/systemui/shade/NotificationPanelViewController.java
-@@ -4664,6 +4664,9 @@ public final class NotificationPanelViewController implements Dumpable {
+@@ -4666,6 +4666,9 @@ public final class NotificationPanelViewController implements Dumpable {
                              /* alpha= */ 1f,
                              keyguardShowing ? View.VISIBLE : View.INVISIBLE);
                  }
@@ -66,7 +66,7 @@ index b7b6bcbd..64221b97 100644
                      mQsController.hideQsImmediately();
                  }
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
-index 7b6fc66a..fd79b045 100644
+index 6afc2bebed44..357165be0ac6 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
 @@ -19,7 +19,12 @@ package com.android.systemui.statusbar.phone;
@@ -91,7 +91,7 @@ index 7b6fc66a..fd79b045 100644
  import android.util.AttributeSet;
  import android.util.Pair;
  import android.util.TypedValue;
-@@ -103,6 +110,7 @@ public class KeyguardStatusBarView extends RelativeLayout {
+@@ -104,6 +111,7 @@ public class KeyguardStatusBarView extends RelativeLayout {
      private int mTopClipping;
      private final Rect mClipRect = new Rect(0, 0, 0, 0);
      private boolean mIsUserSwitcherEnabled;
@@ -99,7 +99,7 @@ index 7b6fc66a..fd79b045 100644
  
      public KeyguardStatusBarView(Context context, AttributeSet attrs) {
          super(context, attrs);
-@@ -226,7 +234,7 @@ public class KeyguardStatusBarView extends RelativeLayout {
+@@ -229,7 +237,7 @@ public class KeyguardStatusBarView extends RelativeLayout {
              // we only show the multi-user switch if it's enabled through UserManager as well as
              // by the user.
              if (mIsUserSwitcherEnabled) {
@@ -108,7 +108,7 @@ index 7b6fc66a..fd79b045 100644
              } else {
                  mMultiUserAvatar.setVisibility(View.GONE);
              }
-@@ -533,4 +541,96 @@ public class KeyguardStatusBarView extends RelativeLayout {
+@@ -536,4 +544,96 @@ public class KeyguardStatusBarView extends RelativeLayout {
          super.onMeasure(widthMeasureSpec, heightMeasureSpec);
          Trace.endSection();
      }
@@ -206,5 +206,5 @@ index 7b6fc66a..fd79b045 100644
 +    }
  }
 -- 
-2.34.1
+2.17.1
 

@@ -1,7 +1,7 @@
-From e691e38583ea8d28e5027648a4cf150961c35359 Mon Sep 17 00:00:00 2001
+From 80bb5677ef6f05ac6351f8660666109b0a01785a Mon Sep 17 00:00:00 2001
 From: KoysX <2685697179b@gmail.com>
 Date: Mon, 24 Jul 2023 19:29:53 +0800
-Subject: [PATCH] add-Lockscreen-text-size-settings
+Subject: [PATCH 5/7] add-Lockscreen-text-size-settings
 
 ---
  core/java/android/provider/Settings.java      | 10 ++++++++
@@ -11,10 +11,10 @@ Subject: [PATCH] add-Lockscreen-text-size-settings
  4 files changed, 50 insertions(+), 1 deletion(-)
 
 diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
-index 19507dba..c0cc52ee 100644
+index c6b6cf53cf5b..5b211bfe4d3a 100644
 --- a/core/java/android/provider/Settings.java
 +++ b/core/java/android/provider/Settings.java
-@@ -12425,6 +12425,16 @@ public final class Settings {
+@@ -12441,6 +12441,16 @@ public final class Settings {
           */
          public static final String KG_CUSTOM_CLOCK_TOP_MARGIN = "kg_custom_clock_top_margin";
  
@@ -32,7 +32,7 @@ index 19507dba..c0cc52ee 100644
           * Keys we no longer back up under the current schema, but want to continue to
           * process when restoring historical backup datasets.
 diff --git a/packages/SystemUI/customization/src/com/android/systemui/shared/clocks/DefaultClockController.kt b/packages/SystemUI/customization/src/com/android/systemui/shared/clocks/DefaultClockController.kt
-index dfb48981..39e4a5fd 100644
+index dfb489810274..39e4a5fdacc6 100644
 --- a/packages/SystemUI/customization/src/com/android/systemui/shared/clocks/DefaultClockController.kt
 +++ b/packages/SystemUI/customization/src/com/android/systemui/shared/clocks/DefaultClockController.kt
 @@ -108,6 +108,8 @@ class DefaultClockController(
@@ -68,7 +68,7 @@ index dfb48981..39e4a5fd 100644
  
          open fun recomputePadding(targetRegion: Rect?) {}
 diff --git a/packages/SystemUI/src/com/android/keyguard/ClockEventController.kt b/packages/SystemUI/src/com/android/keyguard/ClockEventController.kt
-index 3b9060ad..bb427b41 100644
+index 3b9060ad0ac3..bb427b41cea9 100644
 --- a/packages/SystemUI/src/com/android/keyguard/ClockEventController.kt
 +++ b/packages/SystemUI/src/com/android/keyguard/ClockEventController.kt
 @@ -220,6 +220,7 @@ constructor(
@@ -80,10 +80,10 @@ index 3b9060ad..bb427b41 100644
              }
  
 diff --git a/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java b/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java
-index cecb37b8..75af62ea 100644
+index 75a4840748b5..fd909b8f9b2f 100644
 --- a/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java
 +++ b/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java
-@@ -510,6 +510,30 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
+@@ -552,6 +552,30 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
                  },
                  UserHandle.USER_ALL);
  
@@ -115,5 +115,5 @@ index cecb37b8..75af62ea 100644
  
          mConfigurationController.addCallback(mConfigurationListener);
 -- 
-2.34.1
+2.17.1
 

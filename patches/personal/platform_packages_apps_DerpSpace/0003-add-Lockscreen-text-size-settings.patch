@@ -1,7 +1,7 @@
-From 92e902002225590a1e63afd3b82189dc31a3a865 Mon Sep 17 00:00:00 2001
+From ca5ff6a685739b1cabf5b74af3661732f98a5c5d Mon Sep 17 00:00:00 2001
 From: KoysX <2685697179b@gmail.com>
 Date: Mon, 31 Jul 2023 12:08:22 +0800
-Subject: [PATCH] add-Lockscreen-text-size-settings
+Subject: [PATCH 3/4] add-Lockscreen-text-size-settings
 
 ---
  res/values/strings.xml    |  3 +++
@@ -9,10 +9,10 @@ Subject: [PATCH] add-Lockscreen-text-size-settings
  2 files changed, 21 insertions(+)
 
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index 5f240eb..29144b5 100644
+index 580b3f18..7b786b67 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
-@@ -590,4 +590,7 @@
+@@ -598,4 +598,7 @@
      <!-- Lockscreen Clock -->
      <string name="lockscreen_clock_title">Clock</string>
      <string name="kg_custom_clock_top_margin_title">Double-line clock position</string>
@@ -21,7 +21,7 @@ index 5f240eb..29144b5 100644
 +    <string name="kg_big_clock_text_size_title">Double-line Lockscreen clock size</string>
  </resources>
 diff --git a/res/xml/lockscreen_ui.xml b/res/xml/lockscreen_ui.xml
-index fd675c4..1d23476 100644
+index dae34198..f842b74e 100644
 --- a/res/xml/lockscreen_ui.xml
 +++ b/res/xml/lockscreen_ui.xml
 @@ -64,6 +64,24 @@
@@ -50,5 +50,5 @@ index fd675c4..1d23476 100644
  
      <PreferenceCategory
 -- 
-2.34.1
+2.17.1
 

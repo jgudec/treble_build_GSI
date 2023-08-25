@@ -1,7 +1,7 @@
-From 3fa90d4ecc3598d9e3e46bfc58034ca06477a77e Mon Sep 17 00:00:00 2001
+From a34411665fe09fb5e49ee23b1f1b3e15f8e20543 Mon Sep 17 00:00:00 2001
 From: Victor Bo <bvoid@yandex.ru>
 Date: Sat, 23 May 2020 23:45:05 +0300
-Subject: [PATCH] OOS style switches
+Subject: [PATCH 1/7] OOS style switches
 
   * from
   https://github.com/Havoc-OS/android_frameworks_base/commit/19077416ce4ca8f06efff016a9d134ed05b7a851
@@ -11,7 +11,7 @@ Subject: [PATCH] OOS style switches
  2 files changed, 50 insertions(+), 22 deletions(-)
 
 diff --git a/core/res/res/color/switch_track_material.xml b/core/res/res/color/switch_track_material.xml
-index 0c8caa92b6c..46777320fcf 100644
+index 0c8caa92b6cc..46777320fcf8 100644
 --- a/core/res/res/color/switch_track_material.xml
 +++ b/core/res/res/color/switch_track_material.xml
 @@ -20,5 +20,8 @@
@@ -24,7 +24,7 @@ index 0c8caa92b6c..46777320fcf 100644
      <item android:color="?attr/colorForeground" />
  </selector>
 diff --git a/core/res/res/drawable/switch_track_material.xml b/core/res/res/drawable/switch_track_material.xml
-index 8b028d3bb82..6548cde64f8 100644
+index 8b028d3bb825..6548cde64f80 100644
 --- a/core/res/res/drawable/switch_track_material.xml
 +++ b/core/res/res/drawable/switch_track_material.xml
 @@ -1,28 +1,53 @@
@@ -104,5 +104,5 @@ index 8b028d3bb82..6548cde64f8 100644
 -</layer-list>
 +</selector>
 -- 
-2.25.1
+2.17.1
 
